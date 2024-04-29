@@ -13,6 +13,8 @@ public class NhanVienDTO {
     private String email;
     private int luong1Ngay;
     private int xuLy; // 0 là chưa xóa, 1 là đã xóa
+    
+    public static String[] header = {"Mã Nhân Viên","Tên Nhân Viên","Giới Tính","Ngày Sinh","Ngày Vào Làm","Chức Vụ","Số Ngày Nghỉ Phép","Lương 1 Ngày","Email"};
 
     public NhanVienDTO() {
     }

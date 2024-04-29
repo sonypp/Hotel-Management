@@ -99,4 +99,10 @@ public class PhongBUS {
     	System.out.println(query);
     	return db.getListPhongDTO(query, notNullObj.toArray());
     }
+    
+    public void donPhong(String maP)
+    {
+    	var query = "UPDATE PHONG SET tinhtrang = 0 WHERE maP = ?";
+    	db.executeNonQuery(query, new Object[]{maP});
+    }
 }

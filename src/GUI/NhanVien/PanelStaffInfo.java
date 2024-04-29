@@ -406,15 +406,15 @@ public class PanelStaffInfo extends JPanel {
 		}
 	}
 
-	public String createID() {
+	public static String createID(Date ngayVaoLam, int index, int gioiTinh) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
-		String str_dateNgayVaoLam = dateFormat.format(dateNgayVaoLam.getDate());
+		String str_dateNgayVaoLam = dateFormat.format(ngayVaoLam);
 
 		return String.format("NV%1d%s%04d",gioiTinh,str_dateNgayVaoLam,index);
 	}
 
 	public void updateID() {
-		txtMaNV.setText(createID());
+		txtMaNV.setText(createID(dateNgayVaoLam.getDate(),index,gioiTinh));
 	}
 
 	public NhanVienDTO getNhanvien() {

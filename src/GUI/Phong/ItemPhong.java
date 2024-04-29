@@ -15,6 +15,8 @@ import java.util.Date;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
+import BUS.PhongBUS;
+
 public class ItemPhong extends JPanel {
     private JLabel lbTT, lbGiaP, lbCTLP, lbLoaiP, lbTime, lbRealDay;
     private JPanel panel1;
@@ -36,10 +38,11 @@ public class ItemPhong extends JPanel {
     private JTextField txtNgaytra;
     private JPanel pnTenPhong;
     private JLabel lblTnPhng_2;
+    
+    private PhongBUS phongBUS = new PhongBUS();
 
     public ItemPhong(PhongDTO phongDTO) {
         this.phongDTO = phongDTO;
-        this.phongDTO.setTinhTrang(1);
         initializeComponents();
     }
 
@@ -59,14 +62,14 @@ public class ItemPhong extends JPanel {
                 Color color1, color2;
                 switch (status)
                 {
-                	case 0 | 1:
+                	case 0:
                 		color1 = new Color(76, 175, 80);
                 		color2 = new Color(0, 255, 0);
                 		break;
-//                	case 1:
-//                		color1 = new Color(255, 0, 0);
-//                		color2 = new Color(255, 100, 100);
-//                		break;
+                	case 1:
+                		color1 = new Color(76, 175, 80);
+                		color2 = new Color(0, 255, 0);
+                		break;
                 	default:
                 		color1 = new Color(184, 134, 11);
                 		color2 = new Color(255, 255, 153);
@@ -149,7 +152,7 @@ public class ItemPhong extends JPanel {
         temp.setFont(new Font("Arial", Font.BOLD, 14));
         infoPanel.add(temp);
 
-        setContextMenus();
+        setContextMenus(phongDTO.getTinhTrang());
 
         timerRealTime.start();
 
@@ -229,7 +232,7 @@ public class ItemPhong extends JPanel {
         pnTenPhong.add(lblTnPhng_2);
     }
 
-    private void setContextMenus() {
+    private void setContextMenus(int status) {
         mItemBooking.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -251,21 +254,35 @@ public class ItemPhong extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 // Action for clean room menu item
                 handleCleanRoom();
+                refreshUI();
             }
         });
 
-        panel1.setComponentPopupMenu(createPopupMenu());
+        panel1.setComponentPopupMenu(createPopupMenu(status));
     }
 
-    private JPopupMenu createPopupMenu() {
+    private JPopupMenu createPopupMenu(int status) {
         JPopupMenu popupMenu = new JPopupMenu();
-        popupMenu.add(mItemBooking);
-        popupMenu.add(mItemInfo);
-        popupMenu.add(mItemCleanRoom);
+        switch(status) {
+        case 0:
+        	popupMenu.add(mItemBooking);
+            popupMenu.add(mItemInfo);
+        	break;
+        case 1:
+        	popupMenu.add(mItemBooking);
+            popupMenu.add(mItemInfo);
+        	break;
+        default:
+        	popupMenu.add(mItemInfo);
+        	popupMenu.add(mItemCleanRoom);
+        	break;
+        }
+        
         return popupMenu;
     }
 
     private void handleBooking() {
+    	
         var phieuDatPhong = new PhieuDatPhong();
         var popupFrame = new JFrame("Đặt phòng");
         popupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -288,8 +305,8 @@ public class ItemPhong extends JPanel {
     }
 
     private void handleCleanRoom() {
-        // Handle clean room action
-        // Your implementation here
+        phongBUS.donPhong(phongDTO.getMaP());
+        this.phongDTO.setTinhTrang(0);
     }
 
     private void refreshUI() {

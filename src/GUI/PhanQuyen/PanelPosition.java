@@ -13,23 +13,59 @@ import java.awt.Rectangle;
 import java.awt.SystemColor;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+
+import BUS.ChucNangBUS;
+import BUS.NhanVienBUS;
+import BUS.PhanQuyenBUS;
+import BUS.TaiKhoanBUS;
+import DTO.DSNhanVienDTO;
+import DTO.NhanVienDTO;
+import DTO.TaiKhoanDTO;
+import GUI.DangNhap.FormDangNhap;
+
 import java.awt.Component;
 import javax.swing.BoxLayout;
 import javax.swing.border.TitledBorder;
 import javax.swing.DropMode;
+import javax.swing.ImageIcon;
 import javax.swing.ListSelectionModel;
+import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.awt.event.ItemEvent;
+
 
 public class PanelPosition extends JPanel {
 
@@ -55,11 +91,14 @@ public class PanelPosition extends JPanel {
 	private JTable tableDSNV;
 	private JTable tableDSCN;
 	private JButton btnLuuTrangThai;
+	public PhanQuyenBUS pqBUS = new PhanQuyenBUS();
+	public ChucNangBUS cnBUS = new ChucNangBUS();
+	public NhanVienBUS nvBUS = new NhanVienBUS();
+	public DSNhanVienDTO nvDTO = new DSNhanVienDTO();
+	public TaiKhoanBUS tkBUS = new TaiKhoanBUS();
+	public TaiKhoanDTO tkDTO = new TaiKhoanDTO();
 
-	/**
-	 * Create the panel.
-	 */
-	public PanelPosition() {
+	public PanelPosition(){
 		setBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(192, 192, 192)));
 		setBounds(new Rectangle(0, 0, this.width, this.height));
 		setBackground(new Color(245, 245, 245));
@@ -93,7 +132,18 @@ public class PanelPosition extends JPanel {
 		panelQLTK.setLayout(null);
 		
 		
-		tableDSNV = new JTable();
+		tableDSNV = new JTable()
+				{
+					@Override
+					public TableCellEditor getCellEditor(int row, int column)
+					{
+						return null;
+					}
+				};
+	
+
+		tableDSNV.getTableHeader().setReorderingAllowed(false);
+		
 		tableDSNV.setDoubleBuffered(true);
 		tableDSNV.setAutoCreateRowSorter(true);
 		tableDSNV.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
@@ -107,22 +157,180 @@ public class PanelPosition extends JPanel {
 		tableDSNV.setRowMargin(5);
 		tableDSNV.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		tableDSNV.setGridColor(new Color(192, 192, 192));
-		tableDSNV.setBackground(new Color(245, 255, 250));
+		tableDSNV.setBackground(new Color(255, 255, 255));
 		tableDSNV.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		tableDSNV.setModel(new DefaultTableModel(
 			new Object[][] {},
 			new String[] {
-				"STT", "Mã nhân viên", "Tên nhân viên", "Tài khoản", "Tình trạng", "Tạo", "Sửa"
+				"STT", "Mã nhân viên", "Tên nhân viên", "Chức vụ", "Tài khoản", "Tình trạng", "Tạo", "Sửa", "Xóa"
 			}
 		));
 		tableDSNV.getColumnModel().getColumn(0).setPreferredWidth(28);
 		tableDSNV.getColumnModel().getColumn(0).setMinWidth(28);
 		
+		tableDSNV.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int column = tableDSNV.columnAtPoint(e.getPoint());
+		        int row = tableDSNV.rowAtPoint(e.getPoint());
+		        
+			       
+			     if(row != -1) {  
+				        String maNV = tableDSNV.getValueAt(row, 1).toString();
+			            String tenNV = tableDSNV.getValueAt(row, 2).toString();
+			            String pq = tableDSNV.getValueAt(row, 3).toString();
+			            String tenTK = tableDSNV.getValueAt(row, 4).toString();
+			            String TT = tableDSNV.getValueAt(row, 5).toString();
+			            
+			            
+			            if(column == 6) 
+				        {
+				        	if(TT.equals("Chưa thiết lập")) 
+				            {
+				            	
+		    				    	String newTaiKhoan = JOptionPane.showInputDialog(null, "Nhập tài khoản mới\nMã nhân viên: " + maNV + "\nTên nhân viên: " + tenNV + "\nThêm tài khoản", JOptionPane.PLAIN_MESSAGE);
+		    				    	if (newTaiKhoan != null && !newTaiKhoan.isEmpty()) 
+		    				    	{
+		    				    		
+		    				    		tkBUS.TaoTaiKhoan(newTaiKhoan, maNV, maNV, 0, 0);
+		    				    		DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
+		    				    		TT = "Đâ cấp tài khoản";
+		    	                        model.setValueAt(newTaiKhoan, row, 4);
+		    	                        model.setValueAt(TT, row, 5);
+		    				    	}
+		    						
+		    				    	
+		    				  
+		    				}
+		    				else if (TT.equals("Đang hoạt động"))
+		    				{
+		    					JOptionPane.showMessageDialog(null, "Nhân viên đã có tài khoản.");
+		    				}
+		    				else 
+		    				{
+		    					JOptionPane.showMessageDialog(null, "Nhân viên này đã bị khóa tài khoản");
+		    				}
+				            	
+				        }
+				    
+				        if (column == 7) 
+				        {
+				        	JPopupMenu popupMenu = new JPopupMenu();
+				            JMenuItem menuItemKhoaTaiKhoan = new JMenuItem("Khóa tài khoản");
+				            JMenuItem menuItemMoKhoa = new JMenuItem("Mở khóa");
+				            JMenuItem menuItemPhanQuyen = new JMenuItem("Phân quyền");
+				            
+				            menuItemKhoaTaiKhoan.addActionListener(new ActionListener() {
+				                public void actionPerformed(ActionEvent e) {
+				                	String TT = tableDSNV.getValueAt(row, 5).toString();
+				                  
+				                    tkBUS.KhoaTaiKhoan(tenTK);
+					                DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
+					                TT = "Đã khóa";
+			    	                model.setValueAt(TT, row, 5);
+			    	                JOptionPane.showMessageDialog(null, "Khóa tài khoản thành công");
+				    				
+				                    
+			                 }
+			                });
+				            menuItemMoKhoa.addActionListener(new ActionListener(){
+
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									String TT = tableDSNV.getValueAt(row, 5).toString();
+									
+									tkBUS.MoKhoaTaiKhoan(tenTK);
+									DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
+					                TT = "Đang hoạt động";
+			    	                model.setValueAt(TT, row, 5);
+			    	                JOptionPane.showMessageDialog(null, "Mở khóa tài khoản thành công");
+									
+								}
+				            	
+				            });
+				            menuItemPhanQuyen.addActionListener(new ActionListener() {
+				                public void actionPerformed(ActionEvent e) {
+				                	String maNV = tableDSNV.getValueAt(row, 1).toString();
+				                    String tenNV = tableDSNV.getValueAt(row, 2).toString();
+				                    String tenTK = tableDSNV.getValueAt(row, 4).toString();
+				                    
+				                        JPanel panel = new JPanel();
+				                        JTextField txtTK = new JTextField(tenTK);
+				                        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+				                        JLabel lblTaiKhoan = new JLabel("Tài khoản: ");
+				                        panel.add(lblTaiKhoan);
+				                        panel.add(txtTK);				                        JLabel lblPhanQuyen = new JLabel("Phân quyền: ");
+				                        panel.add(lblPhanQuyen);
+				                        cbBoxViTri.setSelectedItem(pq);
+				                        panel.add(cbBoxViTri);
+				                        int options = JOptionPane.showOptionDialog(null, panel, "", JOptionPane.OK_CANCEL_OPTION, 
+				                        											JOptionPane.PLAIN_MESSAGE, null, null, null);
+				                        if (options == JOptionPane.OK_OPTION)
+				                        {
+				                        	String taiKhoan = tableDSNV.getValueAt(row, 4).toString();
+				                        	String newTaiKhoan = txtTK.getText();
+				                        	String matKhau = tkDTO.getMatKhau();
+				                        	int tinhTrang = tkDTO.getTinhTrang();
+				                        	
+				                        	tkBUS.SuaTaiKhoan(taiKhoan, newTaiKhoan);
+				                        	
+					                    	DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
+					                    	model.setValueAt(newTaiKhoan, row, 4);
+					                    	
+					                    	int viTri = cbBoxViTri.getSelectedIndex();
+					                        try {
+												pqBUS.suaPQcuaNV(maNV, viTri);
+											} catch (SQLException e1) {
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											}
+					                        
+					                        var dsnv = nvBUS.getAllDSNV();
+					                        setTBDanhSachNV(dsnv);
+				                        }
+				                }
+				            });
+		            if(TT.equals("Đang hoạt động"))
+		            {
+		            	popupMenu.add(menuItemKhoaTaiKhoan);
+			            popupMenu.add(menuItemPhanQuyen);
+			            popupMenu.show(e.getComponent(), e.getX(), e.getY());
+		            }
+		            if(TT.equals("Đã khóa"))
+		            {
+			            popupMenu.add(menuItemMoKhoa);
+			            popupMenu.show(e.getComponent(), e.getX(), e.getY());
+		            }
+		            if(TT.equals("Chưa thiết lập"))
+		            {
+				        
+			            popupMenu.add(menuItemPhanQuyen);
+			            popupMenu.show(e.getComponent(), e.getX(), e.getY());
+		            }
+				}
+		        }
+			     
+			if(column == 8) {
+				int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa tài khoản này không?", "Xác nhận xóa tài khoản", JOptionPane.YES_NO_OPTION);
+				if (confirm == JOptionPane.YES_OPTION) {
+					String taiKhoan = tableDSNV.getValueAt(row, 4).toString();
+					
+					DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
+			        model.removeRow(row);
+			        
+			        tkBUS.XoaTaiKhoan(taiKhoan);
+			        
+			        JOptionPane.showMessageDialog(null, "Đã xóa tài khoản thành công.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+			}
+			});
+		
         
 		scrollPaneDSNV = new JScrollPane(tableDSNV);
 		scrollPaneDSNV.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPaneDSNV.setForeground(new Color(255, 255, 255));
-		scrollPaneDSNV.setBounds(28, 242, 624, 343);
+		scrollPaneDSNV.setBounds(10, 242, 661, 343);
 		panelQLTK.add(scrollPaneDSNV);
 		scrollPaneDSNV.setBackground(SystemColor.window);
 		scrollPaneDSNV.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -136,13 +344,29 @@ public class PanelPosition extends JPanel {
 		
 		txtTimKiem = new JTextField();
 		txtTimKiem.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		txtTimKiem.setBackground(new Color(245, 255, 250));
+		txtTimKiem.setBackground(new Color(255, 255, 255));
 		txtTimKiem.setBounds(6, 29, 455, 35);
 		txtTimKiem.setPreferredSize(new Dimension(68, 50));
 		panelQLTK_TimKiem.add(txtTimKiem);
 		txtTimKiem.setColumns(10);
 		
 		btnTimKiem = new JButton("Tìm Kiếm");
+		btnTimKiem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String keyword = txtTimKiem.getText();
+				
+				
+				if(keyword.equals("")) {
+					setTBDanhSachNV( nvBUS.getAllDSNV());
+				}
+				else {
+					List<DSNhanVienDTO> dsnv = nvBUS.timKiemNV(keyword, keyword);
+					setTBDanhSachNV(dsnv);
+				}
+				
+			}
+			});
+		
 		btnTimKiem.setLocation(483, 29);
 		btnTimKiem.setSize(new Dimension(135, 35));
 		panelQLTK_TimKiem.add(btnTimKiem);
@@ -180,6 +404,8 @@ public class PanelPosition extends JPanel {
 		lblDSTK.setBounds(28, 206, 624, 33);
 		panelQLTK.add(lblDSTK);
 		
+		
+		
 		panelQLQTC = new JPanel();
 		panelQLQTC.setLayout(null);
 		panelQLQTC.setBackground(Color.WHITE);
@@ -213,13 +439,20 @@ public class PanelPosition extends JPanel {
 		panelDSVT.setBounds(28, 104, 454, 81);
 		panelQLQTC.add(panelDSVT);
 		
-		String[] optionViTri = {};
-		cbBoxViTri = new JComboBox<>(optionViTri);
-		cbBoxViTri.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		cbBoxViTri.setBounds(10, 39, 280, 36);
-		panelDSVT.add(cbBoxViTri);
 		
 		btnThemViTri = new JButton("Thêm Vị Trí");
+		btnThemViTri.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String newViTri = JOptionPane.showInputDialog(null, "Nhập vị trí mới", "Thêm vị trí", JOptionPane.PLAIN_MESSAGE);
+				if (newViTri != null && !newViTri.isEmpty()) {
+					String maPQ = String.valueOf(cbBoxViTri.getItemCount());
+		            pqBUS.ThemPhanQuyen(maPQ, newViTri);
+		            cbBoxViTri.addItem(newViTri);
+				}
+				
+			}
+		});
+		
 		btnThemViTri.setSize(new Dimension(135, 35));
 		btnThemViTri.setForeground(new Color(255, 255, 255));
 		btnThemViTri.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -274,18 +507,190 @@ public class PanelPosition extends JPanel {
 		scrollPaneDSCN.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPaneDSCN.setForeground(new Color(105, 105, 105));
 		scrollPaneDSCN.setFont(new Font("Tahoma", Font.BOLD, 14));
-		scrollPaneDSCN.setBackground(SystemColor.window);
-		scrollPaneDSCN.setBounds(28, 242, 454, 342);
+		scrollPaneDSCN.setBackground(new Color(255, 255, 255));
+		scrollPaneDSCN.setBounds(28, 243, 454, 342);
 		panelQLQTC.add(scrollPaneDSCN);
 		
 		btnLuuTrangThai = new JButton("Lưu Trạng Thái");
+		btnLuuTrangThai.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int option = JOptionPane.showConfirmDialog(null, "Bạn có muốn lưu trạng thái không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+			    if (option == JOptionPane.YES_OPTION) {
+			        luuTrangThaiChucNang();
+			    } else {
+			        // Xử lý trường hợp người dùng chọn "Không"
+			    }
+			}
+		});
 		btnLuuTrangThai.setSize(new Dimension(135, 35));
-		btnLuuTrangThai.setForeground(Color.WHITE);
+		btnLuuTrangThai.setForeground(new Color(255, 255, 255));
 		btnLuuTrangThai.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnLuuTrangThai.setBorder(UIManager.getBorder("Button.border"));
-		btnLuuTrangThai.setBackground(UIManager.getColor("Button.default.pressedBackground"));
+		btnLuuTrangThai.setBackground(new Color(0, 128, 0));
 		btnLuuTrangThai.setBounds(337, 595, 145, 35);
 		panelQLQTC.add(btnLuuTrangThai);
 		
+		cbBoxViTri = new JComboBox<>();
+		cbBoxViTri.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				resetChucNang();
+			}
+		});
+		cbBoxViTri.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		cbBoxViTri.setBounds(10, 39, 277, 36);   
+		panelDSVT.add(cbBoxViTri);
+		
+		ResultSet data = pqBUS.GetListPQ();
+		try {
+			while(data.next())
+			{
+				var tenPQ = data.getString("tenPQ");
+				cbBoxViTri.addItem(tenPQ);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		var dsnv = nvBUS.getAllDSNV();
+		
+		resetChucNang();
+		setTBDanhSachNV(dsnv);
 	}
-}
+	class ButtonRenderer extends JButton implements TableCellRenderer {
+	    public ButtonRenderer() {
+	        setOpaque(true);
+	    }
+
+	    @Override
+	    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+	        if (value instanceof Component) {
+	            return (Component) value;
+	        }
+	        return this;
+	    }
+	}
+	private void setTBDanhSachNV(List<DSNhanVienDTO> dsnv) {
+	    try {
+	        int stt = 1;
+	        DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
+	        model.setRowCount(0);
+	        
+	        for (DSNhanVienDTO nv : dsnv) {
+	            String maNV = nv.getMaNV();
+	            String tenNV = nv.getTenNV();
+	            String taiKhoan = nv.getTaiKhoan();
+	            String chucVu = nv.getchucVu();
+	          
+	            int tinhTrang = nv.gettinhTrang();
+	   
+	            String TT ;
+	            if(tinhTrang == -1) {
+	            	TT = "Chưa thiết lập";
+	            }
+	            else if (tinhTrang == 1) {
+	            	TT = "Đã khóa";
+	            }
+	            else {
+	            	TT = "Đang hoạt động";
+	            }
+	         
+
+	            JButton btnTao = new JButton("");
+	            
+	           
+	            btnTao.setBackground(new Color(255,255,255));
+	            URL urlTao = PanelPosition.class.getResource("plus.png");
+	    		btnTao.setIcon(new ImageIcon(urlTao));
+	    		JButton btnSua = new JButton("");
+	    		
+	    		btnSua.addActionListener(new ActionListener() {
+	    		    public void actionPerformed(ActionEvent e) {
+	    		        System.out.println("Here");
+	    		    }
+	    		});
+	    		btnSua.setBackground(new Color(255, 255, 255));
+	            URL urlSua = PanelPosition.class.getResource("sua.png");
+	    		btnSua.setIcon(new ImageIcon(urlSua));
+	    		JButton btnXoa = new JButton("");
+	    		btnXoa.addActionListener(new ActionListener() {
+	    			public void actionPerformed(ActionEvent e) {
+	    				
+	    			}
+	    		});
+	            btnXoa.setBackground(new Color(255, 255, 255));
+	            URL urlXoa = PanelPosition.class.getResource("xoa.png");
+	            btnXoa.setIcon(new ImageIcon(urlXoa));
+	            btnTao.setBorderPainted(false);
+	            btnSua.setBorderPainted(false);
+	            btnXoa.setBorderPainted(false);
+
+	            Object[] rowData = new Object[] { stt++, maNV, tenNV, cbBoxViTri.getItemAt(Integer.valueOf(chucVu)), taiKhoan, TT, btnTao, btnSua, btnXoa };
+	            model.addRow(rowData);
+    
+	        }
+	        var taoCell = new ButtonRenderer();
+	        taoCell.addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent e) {
+    				System.out.print("Here");
+    			}
+    		}
+    		);
+	        tableDSNV.getColumnModel().getColumn(6).setCellRenderer(taoCell);
+            tableDSNV.getColumnModel().getColumn(7).setCellRenderer(new ButtonRenderer());
+            tableDSNV.getColumnModel().getColumn(8).setCellRenderer(new ButtonRenderer());
+            
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	private void LayTuDSNV() {
+		String keyword = txtTimKiem.getText();
+		List<DSNhanVienDTO> NVphuhop = nvBUS.timKiemNV(keyword, keyword);
+		
+	}
+
+
+	private void resetChucNang()
+	{
+		ResultSet data = cnBUS.GetTBChucNang(String.valueOf(cbBoxViTri.getSelectedIndex()));
+		try {
+			var stt = 1;
+			var model = (DefaultTableModel)tableDSCN.getModel();
+			model.setRowCount(0);
+			while(data.next())
+			{
+				var maCN = data.getString("maChucNang");
+				var tenCN = data.getString("tenChucNang");
+				boolean check = (data.getString("Action").equals("true"))? true : false;
+				Object[] objects = new Object[4];
+				objects[0] = stt;
+				objects[1] = maCN;
+				objects[2] = tenCN;
+				objects[3] = check;
+				model.addRow(objects);
+				stt++;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	private void luuTrangThaiChucNang() {
+	    // Lấy số hàng của bảng
+	    int rowCount = tableDSCN.getRowCount();
+
+	    
+	    // Lặp qua từng hàng của bảng
+	    for (int i = 0; i < rowCount; i++) {
+	        // Lấy giá trị của cột "Check" (cột 3) ở hàng i
+	        boolean isChecked = (boolean) tableDSCN.getValueAt(i, 3);
+
+        	 String maCN = (String) tableDSCN.getValueAt(i, 1); 
+        	 String tenPQ = (String) cbBoxViTri.getSelectedItem();
+        	 pqBUS.CapNhatTrangThai(tenPQ, maCN, isChecked);
+	    }
+	}
+	
+}	
+	

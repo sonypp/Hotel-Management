@@ -3,18 +3,16 @@ package DTO;
 public class TaiKhoanDTO {
     private String taiKhoan;
     private String maNV;
-    private String maPQ;
     private String matKhau;
     private int tinhTrang;
     private int xuLy;
 
-    public TaiKhoanDTO() {
+    public TaiKhoanDTO() { 
     }
 
-    public TaiKhoanDTO(String taiKhoan, String maNV, String maPQ, String matKhau, int tinhTrang, int xuLy) {
+    public TaiKhoanDTO(String taiKhoan, String maNV, String matKhau, int tinhTrang, int xuLy) {
         this.taiKhoan = taiKhoan;
         this.maNV = maNV;
-        this.maPQ = maPQ;
         this.matKhau = matKhau;
         this.tinhTrang = tinhTrang;
         this.xuLy = xuLy;
@@ -34,14 +32,6 @@ public class TaiKhoanDTO {
 
     public void setMaNV(String maNV) {
         this.maNV = maNV;
-    }
-
-    public String getMaPQ() {
-        return maPQ;
-    }
-
-    public void setMaPQ(String maPQ) {
-        this.maPQ = maPQ;
     }
 
     public String getMatKhau() {

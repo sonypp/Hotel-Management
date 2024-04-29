@@ -18,6 +18,14 @@ import java.awt.Color;
 import javax.swing.ImageIcon;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
+
+import BUS.ChucNangBUS;
+import BUS.TaiKhoanBUS;
+import DTO.ChiTietChucNangDTO;
+import DTO.DSNhanVienDTO;
+import DTO.TaiKhoanDTO;
+import GUI.Home.HomeForm;
+
 import java.awt.event.ActionListener;
 import java.net.URL;
 import java.awt.event.ActionEvent;
@@ -28,9 +36,12 @@ import javax.swing.JPasswordField;
 public class FormDangNhap extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JTextField txtUserName;
+	private JTextField txtusername;
 	private JPasswordField txtPW;
 	private boolean isEyeIcon1 = true;
+	public TaiKhoanBUS tkBUS = new TaiKhoanBUS();
+	public ChucNangBUS cnBUS = new ChucNangBUS();
+	
 	/**
 	 * Launch the application.
 	 */
@@ -41,7 +52,7 @@ public class FormDangNhap extends JFrame {
 					FormDangNhap frame = new FormDangNhap();
 					frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					e.printStackTrace(); 
 				}
 			}
 		});
@@ -54,7 +65,6 @@ public class FormDangNhap extends JFrame {
 		setFont(new Font("Dialog", Font.BOLD, 20));
 		this.setTitle("ĐĂNG NHẬP HỆ THỐNG KHÁCH SẠN");
 		setName("");
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setBounds(100, 100, 1108, 570);
@@ -71,49 +81,63 @@ public class FormDangNhap extends JFrame {
 		JLabel lblNewLabel = new JLabel("Thông tin đăng nhập");
 		lblNewLabel.setBackground(new Color(240, 240, 240));
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 26));
-		lblNewLabel.setBounds(519, 0, 284, 89);
+		lblNewLabel.setBounds(741, 11, 284, 71);
 		contentPane.add(lblNewLabel);
 		
 		JLabel lblNewLabel_1 = new JLabel("Tên tài khoản");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 20));
-		lblNewLabel_1.setBounds(383, 103, 144, 52);
+		lblNewLabel_1.setBounds(664, 92, 144, 52);
 		contentPane.add(lblNewLabel_1);
 		
 		JLabel lblNewLabel_2 = new JLabel("Mật khẩu");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 20));
-		lblNewLabel_2.setBounds(383, 180, 144, 33);
+		lblNewLabel_2.setBounds(664, 154, 144, 33);
 		contentPane.add(lblNewLabel_2);
 		
 		JButton btnLogin = new JButton("Đăng nhập");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String username = txtUserName.getText();
+				String username = txtusername.getText();
 				String password = new String(txtPW.getPassword());
 				
      			StringBuilder sb = new StringBuilder();				
 				if(username.equals(""))
-				{
-					sb.append("Bạn chưa nhập tên đăng nhập \n");
+				{ 
+					sb.append("Tên đăng nhập không được trống \n");
 				}
 				if(password.equals(""))
 				{
-					sb.append("Bạn chưa nhập mật khẩu \n");
+					sb.append("Mật khẩu không được trống \n");
 				}
 				if(sb.length() > 0)
 				{
 					JOptionPane.showMessageDialog(btnLogin, sb.toString(), "Invalidation", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if(username.equals("ThuanChan") && password.equals("123456"))
+				TaiKhoanDTO tk = tkBUS.GetTK(username);
+				
+				if(tk.getMaNV() == null)
 				{
-					JOptionPane.showMessageDialog(btnLogin, "Đăng nhập thành công");
+					JOptionPane.showMessageDialog(btnLogin, "Tên đăng nhập không tồn tại " , "Thông báo", JOptionPane.ERROR_MESSAGE);
+				}
+				else if(tk.getTinhTrang() == 1)
+				{
+					JOptionPane.showMessageDialog(btnLogin, "Tài khoản đã bị khóa ", "Thông báo", JOptionPane.ERROR_MESSAGE);
+				}
+				else if(!password.equals(tk.getMatKhau()))
+				{
+					JOptionPane.showMessageDialog(btnLogin, "Sai mật khẩu", "Thông báo", JOptionPane.ERROR_MESSAGE);
 				}
 				else
 				{
-					JOptionPane.showConfirmDialog(btnLogin, "Tên đăng nhập hoặc mật khẩu không tồn tại", "Failure", JOptionPane.ERROR_MESSAGE);
-				}
 					
-				
+					dispose();
+					HomeForm hf = new HomeForm();
+					
+					
+					
+					hf.setVisible(true);
+				}
 			}
 			
 			
@@ -124,10 +148,10 @@ public class FormDangNhap extends JFrame {
 		btnLogin.setBorder(new LineBorder(null, 1, true));
 		URL urliconlogin = FormDangNhap.class.getResource("iconlogin.png");
 		btnLogin.setIcon(new ImageIcon(urliconlogin));
-		btnLogin.setBackground(new Color(0, 128, 255));
+		btnLogin.setBackground(new Color(0, 128, 0));
 		btnLogin.setForeground(new Color(0, 0, 0));
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnLogin.setBounds(537, 279, 406, 45);
+		btnLogin.setBounds(664, 197, 420, 38);
 		contentPane.add(btnLogin);
 		
 		JPanel panel = new JPanel();
@@ -144,7 +168,7 @@ public class FormDangNhap extends JFrame {
 		});
 		btnChangePW.setBackground(new Color(255, 255, 0));
 		btnChangePW.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnChangePW.setBounds(537, 329, 199, 45);
+		btnChangePW.setBounds(664, 245, 211, 45);
 		contentPane.add(btnChangePW);
 		
 		JButton btnForgotPW = new JButton("Quên mật khẩu");
@@ -157,14 +181,14 @@ public class FormDangNhap extends JFrame {
 		});
 		btnForgotPW.setBackground(new Color(255, 0, 128));
 		btnForgotPW.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnForgotPW.setBounds(741, 329, 202, 45);
+		btnForgotPW.setBounds(880, 245, 204, 45);
 		contentPane.add(btnForgotPW);
 		
-		txtUserName = new JTextField();
-		txtUserName.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		txtUserName.setBounds(537, 110, 406, 33);
-		contentPane.add(txtUserName);
-		txtUserName.setColumns(10);
+		txtusername = new JTextField();
+		txtusername.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		txtusername.setBounds(825, 102, 259, 33);
+		contentPane.add(txtusername);
+		txtusername.setColumns(10);
 		
 		JButton btneye1 = new JButton("");
 		btneye1.addActionListener(new ActionListener() {
@@ -172,17 +196,23 @@ public class FormDangNhap extends JFrame {
 				isEyeIcon1 = !isEyeIcon1;
 				URL newIconUrl = isEyeIcon1 ? FormDoiMatKhau.class.getResource("iconeye.png") : FormDoiMatKhau.class.getResource("hidden.png");
 				btneye1.setIcon(new ImageIcon(newIconUrl));
+				if (isEyeIcon1) {
+		            txtPW.setEchoChar('●'); // Ẩn password
+		        } else {
+		            txtPW.setEchoChar((char) 0); // Hiển thị password
+		        }
 			}
 		});
 		btneye1.setBackground(new Color(255, 255, 255));
 		URL urlIconeye = FormDangNhap.class.getResource("iconeye.png");
 		btneye1.setIcon(new ImageIcon(urlIconeye));
-		btneye1.setBounds(905, 180, 38, 33);
-		contentPane.add(btneye1);
+		btneye1.setBounds(1046, 154, 38, 33);
+		btneye1.setBorder(null);
+		contentPane.add(btneye1);  
 		
 		
-		JLabel lblLoginImage = new JLabel("New label");
-		lblLoginImage.setBounds(10, 50, 358, 433);
+		JLabel lblLoginImage = new JLabel("");
+		lblLoginImage.setBounds(10, 10, 631, 492);
 		URL urlPNGlogin = FormDangNhap.class.getResource("login.png");
 		lblLoginImage.setIcon(new ImageIcon(urlPNGlogin));
 		contentPane.add(lblLoginImage);
@@ -193,7 +223,14 @@ public class FormDangNhap extends JFrame {
 		
 		txtPW = new JPasswordField();
 		txtPW.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		txtPW.setBounds(537, 180, 369, 33);
+		txtPW.setBounds(825, 154, 221, 33);
 		contentPane.add(txtPW);
 	}
+	public void HienThiChucNang() {
+		String username = txtusername.getText();
+		var a = cnBUS.PhanQuyenQuanLy(username);
+		System.out.print(a);
+		
+	}
+	
 }

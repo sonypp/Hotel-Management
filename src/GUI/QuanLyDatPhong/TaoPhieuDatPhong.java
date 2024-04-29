@@ -249,7 +249,7 @@ public class TaoPhieuDatPhong extends JPanel {
 	{
 		for (int i = 0; i < listPhongDTO.size(); i++) {
             ItemPhong phong = new ItemPhong(listPhongDTO.get(i));
-            phong.setPreferredSize(new Dimension(350, 250));
+            phong.setPreferredSize(new Dimension(350, 300));
             phong.setBackground(Color.GREEN);
             phong.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             rowPanel.add(phong);

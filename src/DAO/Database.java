@@ -12,15 +12,15 @@ public class Database {
 	Statement stmt;
 	PreparedStatement pstmt;
 	ResultSet rs;
-	String serverName = "VINH\\SQLEXPRESS";
-	String dbName = "QLKS";
+	String serverName = "NORMAN\\NORMAN";
+	String dbName = "QLKSJAVA";
 	public Database() {
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			String url = "jdbc:sqlserver://" + serverName + ":1433;databaseName=" + dbName
 					+ ";encrypt=true;trustServerCertificate=true";
 			String userName = "sa";
-			String password = "123456789";
+			String password = "123456";
 			conn = DriverManager.getConnection(url, userName, password);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -129,6 +129,17 @@ public class Database {
 		return null;
 	}
 
+	public ResultSet executeQuery(String query) {
+        
+        try {
+        	pstmt = conn.prepareStatement(query);
+			return pstmt.executeQuery();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+    }
 	public int executeNonQueryGetInteger(String query) {
 		int num = 0;
 		try {
@@ -224,6 +235,44 @@ public class Database {
 		}
 		return list;
 	}
+	/*DSNHANVIENDTO*/
+	public List<DSNhanVienDTO> toListDSNV_DTO(ResultSet rs) throws SQLException {
+        List<DSNhanVienDTO> list = new ArrayList<>();
+        while (rs.next()) {
+            DSNhanVienDTO nv = new DSNhanVienDTO(
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getString(4),
+                    rs.getInt(5)
+            );
+            list.add(nv);
+        }
+        return list;
+    }
+
+    public List<DSNhanVienDTO> getListDSNV_DTO(String query) {
+        List<DSNhanVienDTO> list = new ArrayList<>();
+        try{
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+            list = toListDSNV_DTO(rs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<DSNhanVienDTO> getListDSNV_DTO(String query, Object[] params) {
+        List<DSNhanVienDTO> list = new ArrayList<>();
+        try {
+            rs = executeQuery(query,params);
+            list = toListDSNV_DTO(rs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
 	/* KHACHHANGDTO */
 	public List<KhachHangDTO> toListKH_DTO(ResultSet rs) throws SQLException {
@@ -360,16 +409,21 @@ public class Database {
 		return list;
 	}
 
-	/* TAIKHOANDTO */
-	public List<TaiKhoanDTO> toListTK_DTO(ResultSet rs) throws SQLException {
-		List<TaiKhoanDTO> list = new ArrayList<>();
-		while (rs.next()) {
-			TaiKhoanDTO tk = new TaiKhoanDTO(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
-					rs.getInt(5), rs.getInt(6));
-			list.add(tk);
-		}
-		return list;
-	}
+	 /*TAIKHOANDTO*/
+	 public List<TaiKhoanDTO> toListTK_DTO(ResultSet rs) throws SQLException {
+        List<TaiKhoanDTO> list = new ArrayList<>();
+            while (rs.next()) {
+                TaiKhoanDTO tk = new TaiKhoanDTO(
+                        rs.getString(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getInt(4),
+                        rs.getInt(5)
+                );
+                list.add(tk);
+            }
+        return list;
+    }
 
 	public List<TaiKhoanDTO> getListTK_DTO(String query) {
 		List<TaiKhoanDTO> list = new ArrayList<>();

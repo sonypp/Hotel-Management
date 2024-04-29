@@ -1,6 +1,7 @@
 package BUS;
 
 import DAO.Database;
+import DTO.DSNhanVienDTO;
 import DTO.NhanVienDTO;
 
 import java.util.ArrayList;
@@ -17,6 +18,12 @@ public class NhanVienBUS {
     public List<NhanVienDTO> getAllNhanVien() {
         String query = "select * from NhanVien where XuLy = 0";
         return db.getListNV_DTO(query);
+    }
+    public List<DSNhanVienDTO> getAllDSNV() {
+        String query = "SELECT NHANVIEN.maNV, NHANVIEN.tenNV, NHANVIEN.chucVu, TAIKHOAN.taiKhoan, " +
+                "CASE WHEN TAIKHOAN.tinhTrang IS NULL THEN -1 ELSE TAIKHOAN.tinhTrang END AS tinhTrang " +
+                "FROM NHANVIEN LEFT JOIN TAIKHOAN ON NHANVIEN.maNV = TAIKHOAN.maNV WHERE TAIKHOAN.xuLy = 0";
+        return db.getListDSNV_DTO(query);
     }
 
     public int getNhanVienCount() {
@@ -88,6 +95,21 @@ public class NhanVienBUS {
 
         System.out.println(query);
         return db.getListNV_DTO(query,notNullObj.toArray());
+    }
+    public List<DSNhanVienDTO> timKiemNV(String maNV, String tenNV) {
+        ArrayList<Object> params = new ArrayList<>();
+        StringBuilder query = new StringBuilder("SELECT NHANVIEN.maNV, NHANVIEN.tenNV, NHANVIEN.chucVu, TAIKHOAN.taiKhoan, TAIKHOAN.tinhTrang FROM NHANVIEN LEFT JOIN TAIKHOAN ON NHANVIEN.maNV = TAIKHOAN.maNV WHERE NHANVIEN.xuLy = 0");
+
+        if (!maNV.isEmpty()) {
+            query.append(" AND NHANVIEN.maNV LIKE ?");
+            params.add(maNV);
+        }
+        if (!tenNV.isEmpty()) {
+            query.append(" OR NHANVIEN.tenNV LIKE ?");
+            params.add(tenNV);
+        }
+
+        return db.getListDSNV_DTO(query.toString(), params.toArray());
     }
     public void deleteNhanVien(String maNV) {
         String query = "update NhanVien set xuLy = 1 where maNV = ?";

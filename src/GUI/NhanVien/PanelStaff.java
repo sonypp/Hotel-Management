@@ -1,5 +1,6 @@
 package GUI.NhanVien;
 import DTO.NhanVienDTO;
+import GUI.Home.HomeForm;
 import GUI.Phong.ThemPhongPanel;
 import BUS.NhanVienBUS;
 
@@ -27,18 +28,17 @@ import com.toedter.calendar.JDateChooser;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
 public class PanelStaff extends JPanel {
-	private static int width = 1251;
-	private static int height = 835;
-	private static int[] lengthColumn = {50,120,300,100,120,120,100,150,150,250};
+	public static int width = 1251;
+	public static int height = 835;
+	public static int[] lengthColumn = {50,120,300,100,120,120,100,150,150,250};
 	private static String[] optionChucVu = {"Quản lý","Lễ tân","Kế Toán","Bếp"};
 	private static String[] optionGioiTinh = {"Nam","Nữ"};
 	private static final long serialVersionUID = 1L;
@@ -60,7 +60,7 @@ public class PanelStaff extends JPanel {
 	private JButton btnSuaNV;
 	private DefaultTableModel modelDSNV;
 	private JTable tableDSNV;
-	private NhanVienDTO selectedNV;
+	private List<NhanVienDTO> dataDSNV;
 	private JDateChooser dateVaoLam_from;
 	private NhanVienBUS busNhanVien;
 	private JDateChooser dateVaoLam_to;
@@ -85,6 +85,7 @@ public class PanelStaff extends JPanel {
 	private JLabel lblSoNgayPhep_max;
 	private JLabel lblKetQuaTimKiem;
 
+	private ExcelServiceStaff serviceStaff;
 	/**
 	 * Create the panel.
 	 */
@@ -94,6 +95,8 @@ public class PanelStaff extends JPanel {
 		setBackground(new Color(245, 245, 245));
 		setBounds(0, 0, 1251, 835);
 		setLayout(null);
+
+		serviceStaff = new ExcelServiceStaff();
 		
 		panelThuocTinh = new JPanel();
 		panelThuocTinh.setBackground(new Color(255, 255, 255));
@@ -307,6 +310,9 @@ public class PanelStaff extends JPanel {
 						setTableData(result);
 						lblKetQuaTimKiem.setText("Đã lọc theo dữ liệu tìm kiếm");
 				}
+				btnNhapTep.setEnabled(false);
+				btnXuatTep.setEnabled(false);
+
 			}
 		});
 		btnTimKiem.setBorder(UIManager.getBorder("Button.border"));
@@ -322,6 +328,8 @@ public class PanelStaff extends JPanel {
 				resetValueFind();
 				updateViewTable();
 				lblKetQuaTimKiem.setText("");
+				btnNhapTep.setEnabled(true);
+				btnXuatTep.setEnabled(true);
 			}
 		});
 		btnNhapMoi.setBackground(new Color(255, 255, 255));
@@ -382,7 +390,7 @@ public class PanelStaff extends JPanel {
 		btnThemNV = new JButton("Thêm Nhân Viên");
 		btnThemNV.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFrame popupFrame = new JFrame("Thêm Nhân Viên");
+				JFrame popupFrame = new JFrame("Thêm nhân viên");
 				popupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				ActionListener closeFrame = new ActionListener() {
 					@Override
@@ -497,15 +505,10 @@ public class PanelStaff extends JPanel {
 
 		modelDSNV = new DefaultTableModel();
 		modelDSNV.addColumn("STT");
-		modelDSNV.addColumn("Mã Nhân Viên");
-		modelDSNV.addColumn("Tên Nhân Viên");
-		modelDSNV.addColumn("Giới tính");
-		modelDSNV.addColumn("Ngày Sinh");
-		modelDSNV.addColumn("Ngày Vào Làm");
-		modelDSNV.addColumn("Chức vụ");
-		modelDSNV.addColumn("Số ngày nghỉ phép");
-		modelDSNV.addColumn("Luong1Ngay");
-		modelDSNV.addColumn("Email");
+		for (String col : NhanVienDTO.header) {
+			modelDSNV.addColumn(col);
+		}
+
 		tableDSNV = new JTable(modelDSNV) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -548,19 +551,97 @@ public class PanelStaff extends JPanel {
 		panelDSNV_btn_2.setLayout(new GridLayout(1, 2, 20, 5));
 		
 		btnNhapTep = new JButton("Nhập Tệp");
-		panelDSNV_btn_2.add(btnNhapTep);
-		btnNhapTep.setActionCommand("");
+		btnNhapTep.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				serviceStaff.chooseFile();
+				serviceStaff.readFile();
+				if (!serviceStaff.isReadFileSuccess()) return;
+
+				//Khi đọc file thành công
+				List<NhanVienDTO> dataFromFile = serviceStaff.getData();
+
+				//Lấy ra các id trong dataFromFile
+				List<String> maNVFromFile = new ArrayList<>();
+				for (NhanVienDTO nv : dataFromFile) {
+					maNVFromFile.add(nv.getMaNV());
+				}
+
+				//Kiểm tra, Lọc id trùng giữa data và dataFromFile
+				List<String> maNVDupli = checkFileMaNVDupli(maNVFromFile);
+				//Lúc này, maNVFromFile sẽ chỉ còn chứa những id không bị trùng
+				maNVFromFile.removeAll(maNVDupli);
+
+				//Xét trường hợp của các id không bị trùng
+				for (String maNV : maNVFromFile) {
+					for (NhanVienDTO nv: dataFromFile) {
+						if (nv.getMaNV().equals(maNV)) {
+							busNhanVien.addNhanVien(nv.getMaNV(), nv.getTenNV(), nv.getGioiTinh(), nv.getSoNgayPhep(), nv.getChucVu(),
+									nv.getNgaySinh(), nv.getNgayVaoLam(),
+									nv.getEmail(), nv.getLuong1Ngay());
+						}
+					}
+				}
+				//Xét trường hợp của từng id trùng
+				for (String maNV : maNVDupli) {
+					switch (showDialogOptionReadFile("Thông báo",
+							String.format("Trong file có mã nhân viên %s trùng với dữ liệu sẵn có!\nVui lòng chọn cách xử lý!",maNV)))
+					{
+						case JOptionPane.YES_OPTION: {
+							break;
+						}
+						case JOptionPane.NO_OPTION: {
+							for (NhanVienDTO nv : dataFromFile) {
+								if (nv.getMaNV().equals(maNV)){
+									busNhanVien.updateNhanVien(nv.getMaNV(), nv.getTenNV(), nv.getGioiTinh(), nv.getSoNgayPhep(), nv.getChucVu(),
+											nv.getNgaySinh(),nv.getNgayVaoLam(),
+											nv.getEmail(), nv.getLuong1Ngay());
+									break;
+								}
+							}
+							break;
+						}
+						case JOptionPane.CANCEL_OPTION: {
+							for (NhanVienDTO nv : dataFromFile) {
+								if (nv.getMaNV().equals(maNV)){
+									busNhanVien.addNhanVien(PanelStaffInfo.createID(new Date(),busNhanVien.getNhanVienCount()+1,nv.getGioiTinh()),
+											nv.getTenNV(), nv.getGioiTinh(), nv.getSoNgayPhep(), nv.getChucVu(),
+											nv.getNgaySinh(),new Date(),
+											nv.getEmail(), nv.getLuong1Ngay());
+									break;
+								}
+							}
+							break;
+						}
+					}
+				}
+
+				JOptionPane.showMessageDialog(null,"Nhập tệp thành công","Thông báo",JOptionPane.INFORMATION_MESSAGE);
+				updateViewTable();
+			}
+		});
 		btnNhapTep.setForeground(new Color(240, 255, 255));
 		btnNhapTep.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnNhapTep.setBorder(UIManager.getBorder("Button.border"));
 		btnNhapTep.setBackground(new Color(123, 104, 238));
+		panelDSNV_btn_2.add(btnNhapTep);
 		
 		btnXuatTep = new JButton("Xuất Tệp");
-		panelDSNV_btn_2.add(btnXuatTep);
+		btnXuatTep.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				serviceStaff.chooseFile();
+				serviceStaff.setData(dataDSNV);
+				serviceStaff.writeFile();
+
+				JOptionPane.showMessageDialog(null,"Xuất tệp thành công","Thông báo",JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 		btnXuatTep.setForeground(new Color(240, 255, 255));
 		btnXuatTep.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnXuatTep.setBorder(UIManager.getBorder("Button.border"));
 		btnXuatTep.setBackground(new Color(123, 104, 238));
+		panelDSNV_btn_2.add(btnXuatTep);
 	}
 	public void setTableData(List<NhanVienDTO> listNhanVien){
 		// Thêm dữ liệu từ listNV vào model
@@ -573,7 +654,8 @@ public class PanelStaff extends JPanel {
 	}
 	public void updateViewTable(){
 		busNhanVien = new NhanVienBUS();
-		setTableData(busNhanVien.getAllNhanVien());
+		dataDSNV = busNhanVien.getAllNhanVien();
+		setTableData(dataDSNV);
 	}
 	public void resetValueFind() {
 		txtMaNV.setText("");
@@ -706,6 +788,33 @@ public class PanelStaff extends JPanel {
 		}
 		if (!isFound) {i = -1;}
 		return i;
+	}
+
+	public int showDialogOptionReadFile(String title, String message){
+		return JOptionPane.showOptionDialog(
+				null,
+				message, title,
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				new String[]{"Keep Old", "Keep Current", "Add current like new"},
+				"Keep Old"
+		);
+	}
+	public List<String> checkFileMaNVDupli(List<String> maNVFromFile){
+		Set<String> maNVSet = new LinkedHashSet<>();
+		List<String> maNVDupli = new ArrayList<>();
+		for (NhanVienDTO nv : dataDSNV) {
+			maNVSet.add(nv.getMaNV());
+		}
+
+		for (String maNV : maNVFromFile) {
+			if (!maNVSet.add(maNV)){
+				maNVDupli.add(maNV);
+			}
+		}
+
+		return maNVDupli;
 	}
 }
 
