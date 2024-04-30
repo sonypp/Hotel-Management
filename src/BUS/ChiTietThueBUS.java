@@ -4,6 +4,7 @@ import java.util.List;
 import java.sql.Date;
 import DAO.Database;
 import DTO.ChiTietThueDTO;
+import DTO.PhongDTO;
 
 public class ChiTietThueBUS {
     private Database db;

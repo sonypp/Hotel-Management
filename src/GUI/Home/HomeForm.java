@@ -13,6 +13,11 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.Color;
 import java.awt.Dimension;
 
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import com.jgoodies.looks.windows.WindowsLookAndFeel;
+
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.SoftBevelBorder;
 
@@ -84,8 +89,10 @@ public class HomeForm extends JFrame {
 	private JLabel lblHome = new JLabel("");
 	/**
 	 * Launch the application.
+	 * @throws UnsupportedLookAndFeelException 
 	 */
-	public static void main(String[] args)  {
+	public static void main(String[] args) throws UnsupportedLookAndFeelException  {
+		UIManager.setLookAndFeel(new FlatMacLightLaf());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

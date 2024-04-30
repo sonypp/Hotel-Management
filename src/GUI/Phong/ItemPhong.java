@@ -10,10 +10,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
 
 import BUS.PhongBUS;
 
@@ -282,15 +286,93 @@ public class ItemPhong extends JPanel {
     }
 
     private void handleBooking() {
-    	
-        var phieuDatPhong = new PhieuDatPhong();
-        var popupFrame = new JFrame("Đặt phòng");
-        popupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		popupFrame.setSize(1260, 900);
-		popupFrame.getContentPane().add(phieuDatPhong);
-		popupFrame.setLocationRelativeTo(null); // Hiển thị ở giữa màn hình
-		popupFrame.setVisible(true);
-        phieuDatPhong.setVisible(true);
+    	TaoPhieuDatPhong parent = (TaoPhieuDatPhong)getTaoPhieDatPhongForm(this);
+    	if(parent.isValid)
+    	{
+	    	var phieuDatPhong = new PhieuDatPhong();
+	    	var popupFrame = new JFrame("Đặt phòng");
+	        popupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			popupFrame.setSize(1260, 900);
+			popupFrame.getContentPane().add(phieuDatPhong);
+			popupFrame.setLocationRelativeTo(null); // Hiển thị ở giữa màn hình
+	    	if(parent.rdbtnTheoNgay.isSelected())
+	    	{
+	    		var date = parent.dateNgayTra.getDate();
+	    		var ngayThueDate = parent.dateNgayThue.getDate();
+	    		var ngayTraDate = new Date(date.getYear(), date.getMonth(), date.getDay(), ngayThueDate.getHours(), ngayThueDate.getMinutes(), ngayThueDate.getSeconds());
+	    		LocalDateTime ngayThueLocal = ngayThueDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    		LocalDateTime ngayTraLocal = ngayTraDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    		var duration = Duration.between(ngayThueLocal, ngayTraLocal);
+	    		int gia = 0;
+	    		if(phongDTO.getHienTrang() == 0)
+	    		{
+	    			gia = (int) (duration.toDays() * phongDTO.getGiaP());
+	    		}
+	    		else
+	    		{
+	    			gia = (int) (duration.toDays() * phongDTO.getGiaP() / 2);
+	    		}
+	    		var model = (DefaultTableModel)phieuDatPhong.table.getModel();
+	    		model.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Theo ngày", ngayThueDate.toString(), ngayTraDate.toString(), "", gia});
+	    	}
+	    	else if(parent.rdbtnTheoGio.isSelected())
+	    	{
+	    		var ngayTraDate = parent.dateNgayTra.getDate();
+	    		var ngayThueDate = parent.dateNgayThue.getDate();
+	    		LocalDateTime ngayThueLocal = ngayThueDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    		LocalDateTime ngayTraLocal = ngayTraDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    		var duration = Duration.between(ngayThueLocal, ngayTraLocal);
+	    		double tmp = 0;
+	    		switch ((int)duration.toHours())
+	    		{
+		    		case 1:
+		    			tmp = phongDTO.getGiaP() * 0.2 + phongDTO.getGiaP() * duration.toDays();
+		    			break;
+		    		case 2:
+		    			tmp = phongDTO.getGiaP() * 0.1 + phongDTO.getGiaP() * duration.toDays();
+		    			break;
+		    		default:
+		    			tmp = phongDTO.getGiaP() * 0.05 + phongDTO.getGiaP() * duration.toDays();
+		    			break;
+	    		}
+	    		if(phongDTO.getHienTrang() == 1)
+	    		{
+	    			tmp /= 2;
+	    		}
+	    		int gia = (int)tmp;
+	    		var model = (DefaultTableModel)phieuDatPhong.table.getModel();
+	    		model.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Theo giờ", ngayThueDate.toString(), ngayTraDate.toString(), "", gia});
+	    	}
+	    	else
+	    	{
+	    		var ngayThueDate = parent.dateNgayThue.getDate();
+	    		int gia = 0;
+	    		if(phongDTO.getHienTrang() == 0)
+	    		{
+	    			gia = phongDTO.getGiaP();
+	    		}
+	    		else
+	    		{
+	    			gia = phongDTO.getGiaP() / 2;
+	    		}
+	    		var model = (DefaultTableModel)phieuDatPhong.table.getModel();
+	    		model.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Khác", ngayThueDate.toString(), "Chưa xác định", "", gia});
+	    	}
+	        
+	    	popupFrame.setVisible(true);
+	        phieuDatPhong.setVisible(true);
+    	}
+    	else
+    	{
+    		JOptionPane.showMessageDialog(null, "Vui lòng chọn hình thức thuê và chọn thời gian phù hợp và bấm tìm kiếm", "Thông báo", JOptionPane.ERROR_MESSAGE);
+    	}
+    }
+    
+    private Component getTaoPhieDatPhongForm(Component x)
+    {
+    	if(x instanceof TaoPhieuDatPhong)
+    		return x;
+    	return getTaoPhieDatPhongForm(x.getParent());
     }
     
     private void showInfo() {
@@ -307,6 +389,7 @@ public class ItemPhong extends JPanel {
     private void handleCleanRoom() {
         phongBUS.donPhong(phongDTO.getMaP());
         this.phongDTO.setTinhTrang(0);
+        JOptionPane.showMessageDialog(null, "Dọn phòng này thành công, hiện có thể đặt phòng", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void refreshUI() {
@@ -369,4 +452,6 @@ public class ItemPhong extends JPanel {
         Date date = new Date();
         return dateFormat.format(date);
     }
+    
+    
 }

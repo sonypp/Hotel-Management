@@ -12,6 +12,9 @@ import javax.swing.ButtonGroup;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import com.toedter.calendar.JDateChooser;
+
 import javax.swing.JButton;
 
 public class PhieuDatPhong extends JPanel {
@@ -26,13 +29,14 @@ public class PhieuDatPhong extends JPanel {
 	private JTextField tfHTKH;
 	private JTextField tfCMND;
 	private JTextField tfSDT;
-	private JTextField tfNgaySinh;
+	private JDateChooser dateNgaySinh;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JTextField tfDuong;
 	private JTextField tfPhuong;
 	private JTextField tfQuan;
 	private JTextField textField_1;
-	private JTable table;
+	public JTable table;
+	private JTextField textField_2;
 
 	/**
 	 * Create the panel.
@@ -66,6 +70,7 @@ public class PhieuDatPhong extends JPanel {
         pnTTPhieuThue.add(lblNewLabel);
         
         tfMaThue = new JTextField();
+        tfMaThue.setEnabled(false);
         tfMaThue.setBounds(6, 75, 172, 26);
         pnTTPhieuThue.add(tfMaThue);
         tfMaThue.setColumns(10);
@@ -76,6 +81,7 @@ public class PhieuDatPhong extends JPanel {
         pnTTPhieuThue.add(lb);
         
         tfNVLP = new JTextField();
+        tfNVLP.setEnabled(false);
         tfNVLP.setColumns(10);
         tfNVLP.setBounds(242, 75, 172, 26);
         pnTTPhieuThue.add(tfNVLP);
@@ -86,6 +92,7 @@ public class PhieuDatPhong extends JPanel {
         pnTTPhieuThue.add(lblNgyLpPhiu);
         
         tfNLP = new JTextField();
+        tfNLP.setEnabled(false);
         tfNLP.setColumns(10);
         tfNLP.setBounds(503, 75, 172, 26);
         pnTTPhieuThue.add(tfNLP);
@@ -96,11 +103,13 @@ public class PhieuDatPhong extends JPanel {
         pnTTPhieuThue.add(lblNewLabel_1_1);
         
         tfTTXL = new JTextField();
+        tfTTXL.setEditable(false);
+        tfTTXL.setText("Đang xử lý");
         tfTTXL.setColumns(10);
         tfTTXL.setBounds(740, 75, 172, 26);
         pnTTPhieuThue.add(tfTTXL);
         
-        JLabel lblNewLabel_1 = new JLabel("Mã chi tiết thuê");
+        JLabel lblNewLabel_1 = new JLabel("Tiền đặt cọc");
         lblNewLabel_1.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblNewLabel_1.setBounds(993, 42, 172, 21);
         pnTTPhieuThue.add(lblNewLabel_1);
@@ -127,6 +136,7 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3);
         
         tfMaKH = new JTextField();
+        tfMaKH.setEnabled(false);
         tfMaKH.setBounds(6, 71, 162, 26);
         panel.add(tfMaKH);
         tfMaKH.setColumns(10);
@@ -137,6 +147,7 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_1);
         
         tfHTKH = new JTextField();
+        tfHTKH.setEnabled(false);
         tfHTKH.setColumns(10);
         tfHTKH.setBounds(247, 71, 162, 26);
         panel.add(tfHTKH);
@@ -157,6 +168,7 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_3);
         
         tfSDT = new JTextField();
+        tfSDT.setEnabled(false);
         tfSDT.setColumns(10);
         tfSDT.setBounds(746, 71, 162, 26);
         panel.add(tfSDT);
@@ -166,10 +178,11 @@ public class PhieuDatPhong extends JPanel {
         lblNewLabel_3_4.setBounds(1001, 35, 162, 24);
         panel.add(lblNewLabel_3_4);
         
-        tfNgaySinh = new JTextField();
-        tfNgaySinh.setColumns(10);
-        tfNgaySinh.setBounds(1001, 71, 162, 26);
-        panel.add(tfNgaySinh);
+        dateNgaySinh = new JDateChooser();
+        dateNgaySinh.setDateFormatString("dd/MM/yyyy");
+        dateNgaySinh.setEnabled(false);
+        dateNgaySinh.setBounds(1001, 71, 162, 26);
+        panel.add(dateNgaySinh);
         
         JLabel lblNewLabel_3_5 = new JLabel("Giới tính");
         lblNewLabel_3_5.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -177,6 +190,7 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_5);
         
         JRadioButton rdbtnGT0 = new JRadioButton("Nam");
+        rdbtnGT0.setSelected(true);
         buttonGroup.add(rdbtnGT0);
         rdbtnGT0.setBounds(6, 169, 58, 20);
         panel.add(rdbtnGT0);
@@ -197,28 +211,28 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_5_1_1);
         
         tfDuong = new JTextField();
-        tfDuong.setBounds(309, 169, 135, 26);
+        tfDuong.setBounds(303, 167, 67, 26);
         panel.add(tfDuong);
         tfDuong.setColumns(10);
         
         JLabel lblNewLabel_3_5_1_2 = new JLabel("Phường/Thôn:");
         lblNewLabel_3_5_1_2.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblNewLabel_3_5_1_2.setBounds(456, 166, 99, 24);
+        lblNewLabel_3_5_1_2.setBounds(380, 169, 99, 24);
         panel.add(lblNewLabel_3_5_1_2);
         
         tfPhuong = new JTextField();
         tfPhuong.setColumns(10);
-        tfPhuong.setBounds(570, 166, 135, 26);
+        tfPhuong.setBounds(486, 167, 67, 26);
         panel.add(tfPhuong);
         
         JLabel lblNewLabel_3_5_1_2_1 = new JLabel("Quận/Huyện:");
         lblNewLabel_3_5_1_2_1.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblNewLabel_3_5_1_2_1.setBounds(717, 166, 100, 24);
+        lblNewLabel_3_5_1_2_1.setBounds(553, 169, 100, 24);
         panel.add(lblNewLabel_3_5_1_2_1);
         
         tfQuan = new JTextField();
         tfQuan.setColumns(10);
-        tfQuan.setBounds(814, 166, 135, 26);
+        tfQuan.setBounds(651, 167, 67, 26);
         panel.add(tfQuan);
         
         JLabel lblNewLabel_3_5_1_2_1_1 = new JLabel("Quốc tịch:");
@@ -230,6 +244,16 @@ public class PhieuDatPhong extends JPanel {
         textField_1.setColumns(10);
         textField_1.setBounds(1042, 166, 135, 26);
         panel.add(textField_1);
+        
+        JLabel lblNewLabel_3_5_1_2_1_2 = new JLabel("Tỉnh/Thành:");
+        lblNewLabel_3_5_1_2_1_2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblNewLabel_3_5_1_2_1_2.setBounds(722, 169, 100, 24);
+        panel.add(lblNewLabel_3_5_1_2_1_2);
+        
+        textField_2 = new JTextField();
+        textField_2.setColumns(10);
+        textField_2.setBounds(812, 167, 105, 26);
+        panel.add(textField_2);
         
         JPanel pnTable = new JPanel();
         pnTable.setBounds(10, 441, 1231, 302);

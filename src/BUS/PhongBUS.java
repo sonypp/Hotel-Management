@@ -105,4 +105,40 @@ public class PhongBUS {
     	var query = "UPDATE PHONG SET tinhtrang = 0 WHERE maP = ?";
     	db.executeNonQuery(query, new Object[]{maP});
     }
+    
+    public List<PhongDTO> getValidRooms(String ngayThue, String ngayTra, int loaiP, int ctlp, int tinhtrang, int hientrang, int giaTu, int giaDen) {
+        String query = "SELECT room.* " +
+                       "FROM CHITIETTHUEPHONG AS cttp " +
+                       "JOIN CHITIETTHUE AS ctt ON cttp.MaCTT = ctt.MaCTT " +
+                       "JOIN PHONG AS room ON cttp.MaP = room.MaP " +
+                       "WHERE ctt.XuLy = 0 " +
+                       "  AND ctt.TinhTrangXuLy = 0 " +
+                       "  AND cttp.NgayThue <= '" + ngayThue + "' " +
+                       "  AND (cttp.NgayTra >= '" + ngayTra + "' OR cttp.NgayTra IS NULL) " +
+                       "  AND room.TinhTrang = 0 " +
+                       "  AND NOT EXISTS (" +
+                       "      SELECT 1 " +
+                       "      FROM CHITIETTHUEPHONG AS cttph " +
+                       "      JOIN CHITIETTHUE AS ctt ON cttph.MaCTT = ctt.MaCTT " +
+                       "      WHERE cttph.MaP = room.MaP " +
+                       "        AND ctt.XuLy = 0 " +
+                       "        AND ctt.TinhTrangXuLy = 0 " +
+                       "        AND cttph.NgayThue <= '" + ngayThue + "' " +
+                       "        AND (cttph.NgayTra >= '" + ngayTra + "' OR cttph.NgayTra IS NULL) " +
+                       "  ) ";
+        if(loaiP != -1)
+        	query += "  AND (room.LoaiP = " + loaiP + ") ";
+        if(ctlp != -1)
+            query += "  AND (room.ChiTietLoaiP = " + ctlp + ") ";
+        if(tinhtrang != -1)
+            query += "  AND (room.TinhTrang = " + tinhtrang + ") ";
+        if(hientrang != -1)
+            query += "  AND (room.HienTrang = " + hientrang + ") ";
+        query += "  AND (room.GiaP >= " + giaTu + " AND room.GiaP <= " + giaDen + ")";
+
+        return db.getListPhongDTO(query);
+    }
+
+
+
 }
