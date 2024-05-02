@@ -25,6 +25,12 @@ public class NhanVienBUS {
                 "FROM NHANVIEN LEFT JOIN TAIKHOAN ON NHANVIEN.maNV = TAIKHOAN.maNV WHERE TAIKHOAN.xuLy = 0";
         return db.getListDSNV_DTO(query);
     }
+    
+    public NhanVienDTO getNVDTO(String maNV)
+    {
+    	String query = "SELECT * FROM NHANVIEN WHERE maNV = " + maNV;
+    	return db.getListNV_DTO(query).get(0);
+    }
 
     public int getNhanVienCount() {
         String query = "select count(*) from NhanVien";

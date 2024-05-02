@@ -20,6 +20,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
 
 import BUS.ChucNangBUS;
+import BUS.NhanVienBUS;
 import BUS.TaiKhoanBUS;
 import DTO.ChiTietChucNangDTO;
 import DTO.DSNhanVienDTO;
@@ -132,6 +133,8 @@ public class FormDangNhap extends JFrame {
 				{
 					
 					dispose();
+					var nvBUS = new NhanVienBUS();
+					HomeForm.nhanVien = nvBUS.getNVDTO(tk.getMaNV());
 					HomeForm hf = new HomeForm();
 					
 					

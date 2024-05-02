@@ -23,7 +23,7 @@ public class ChiTietThueBUS {
         return db.executeNonQueryGetInteger(query);
     }
 
-    public void InsertCTT(String maCTT, String maKH, String maNV, Date ngayLapPhieu, int tienDatCoc) {
+    public void InsertCTT(String maCTT, String maKH, String maNV, String ngayLapPhieu, String tienDatCoc) {
         String query = String.format("insert into CHITIETTHUE values('%s','%s','%s','%s',%d,0,0)", maCTT, maKH, maNV, ngayLapPhieu, tienDatCoc);
         db.executeNonQuery(query);
     }

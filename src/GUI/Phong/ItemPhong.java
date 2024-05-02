@@ -95,7 +95,7 @@ public class ItemPhong extends JPanel {
         mItemInfo = new JMenuItem("Thông tin phòng");
         mItemCleanRoom = new JMenuItem("Dọn phòng");
 
-        timerRealTime = new Timer(1000, new ActionListener() {
+        timerRealTime = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Update real-time labels
@@ -312,8 +312,8 @@ public class ItemPhong extends JPanel {
 	    		{
 	    			gia = (int) (duration.toDays() * phongDTO.getGiaP() / 2);
 	    		}
-	    		var model = (DefaultTableModel)phieuDatPhong.table.getModel();
-	    		model.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Theo ngày", ngayThueDate.toString(), ngayTraDate.toString(), "", gia});
+	    		var data = phieuDatPhong.data;
+	    		data.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Theo ngày", ngayThueDate.toString(), ngayTraDate.toString(), "", gia});
 	    	}
 	    	else if(parent.rdbtnTheoGio.isSelected())
 	    	{
@@ -340,8 +340,8 @@ public class ItemPhong extends JPanel {
 	    			tmp /= 2;
 	    		}
 	    		int gia = (int)tmp;
-	    		var model = (DefaultTableModel)phieuDatPhong.table.getModel();
-	    		model.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Theo giờ", ngayThueDate.toString(), ngayTraDate.toString(), "", gia});
+	    		var data = phieuDatPhong.data;
+	    		data.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Theo giờ", ngayThueDate.toString(), ngayTraDate.toString(), "", gia});
 	    	}
 	    	else
 	    	{
@@ -355,10 +355,11 @@ public class ItemPhong extends JPanel {
 	    		{
 	    			gia = phongDTO.getGiaP() / 2;
 	    		}
-	    		var model = (DefaultTableModel)phieuDatPhong.table.getModel();
-	    		model.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Khác", ngayThueDate.toString(), "Chưa xác định", "", gia});
+	    		var data = phieuDatPhong.data;
+	    		data.addRow(new Object[] {phongDTO.getMaP(), phongDTO.getTenP(), "Đang xử lý", "Khác", ngayThueDate.toString(), "Chưa xác định", "", gia});
 	    	}
 	        
+	    	phieuDatPhong.hienThiDanhSachPhongThue();
 	    	popupFrame.setVisible(true);
 	        phieuDatPhong.setVisible(true);
     	}

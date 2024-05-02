@@ -18,6 +18,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 
+import DTO.NhanVienDTO;
+
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.SoftBevelBorder;
 
@@ -57,6 +59,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 
 public class HomeForm extends JFrame {
+	
+	public static NhanVienDTO nhanVien;
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
