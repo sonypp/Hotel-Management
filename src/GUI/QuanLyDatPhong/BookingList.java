@@ -3,39 +3,136 @@ package GUI.QuanLyDatPhong;
 
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import com.toedter.calendar.JDateChooser;
+
+import BUS.*;
+import DTO.ChiTietThueDTO;
+import DTO.KhachHangDTO;
+import DTO.NhanVienDTO;
+import GUI.Home.HomeForm;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
 import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JSplitPane;
 
-public class DanhSachThuePhong extends JPanel {
+public class BookingList extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JTextField tf_maChiTietThue;
-	private JTextField tf_maKhachHang;
-	private JTextField tf_tenKhachHang;
-	private JTextField tf_maNhanVien;
+	private JTextField txt_MaCTT;
+	private JTextField txt_MaKH;
+	private JTextField txt_TenKH;
+	private JTextField txt_MaNV;
 	private JTextField tf_tenNhanVien;
-	private JTable tbl_chiTietThuePhong;
+	private JTable tbRoom;
+	private DefaultTableModel tbRoomModel;
+	
+	KhachHangBUS khachHang = new KhachHangBUS();
+	NhanVienBUS nhanVien = new NhanVienBUS();
+	ChiTietThueBUS chiTietThue = new ChiTietThueBUS();
+	private JDateChooser dateTime_NgayLap;
+	
+	public void HienThiDSChiTietThue() {
+	    AtomicInteger stt = new AtomicInteger(0); // Initialize AtomicInteger to 0
+	    var cttAll = chiTietThue.getDSChiTietThue().stream()
+	            .filter(ctt -> ctt.getXuLy() == 0)
+	            .sorted(Comparator.comparing(ChiTietThueDTO::getTinhTrangXuLy).thenComparing(ChiTietThueDTO::getNgayLapPhieu))
+	            .map(ctt -> {
+	                KhachHangDTO kh = khachHang.GetDSKH().stream()
+	                        .filter(k -> k.getMaKH().equals(ctt.getMaKH()))
+	                        .findFirst().orElse(null);
+
+	                NhanVienDTO nv = nhanVien.getAllNhanVien().stream()
+	                        .filter(n -> n.getMaNV().equals(ctt.getMaNV()))
+	                        .findFirst().orElse(null);
+
+	                return new Object[] {
+	                    stt.incrementAndGet(), // Increment stt and get the incremented value
+	                    ctt.getMaCTT(),
+	                    ctt.getMaKH(),
+	                    kh != null ? kh.getTenKH() : null,
+	                    ctt.getMaNV(),
+	                    nv != null ? nv.getTenNV() : null,
+	                    ctt.getNgayLapPhieu().toString(),
+	                    ctt.getTienDatCoc(),
+	                    ctt.getTinhTrangXuLy() == 0 ? "Chưa xử lý" : "Đã xử lý",
+	                };
+	            })
+	            .collect(Collectors.toList());
+	    tbRoomModel.setRowCount(0); // Clear the existing rows
+
+	    for (Object[] ctt : cttAll) {
+	        tbRoomModel.addRow(ctt);
+	    }
+	    tbRoom.clearSelection();
+	}
+	
+	private void btnView_Click() {
+	    if (tbRoom.getSelectedRows().length > 0) {
+	        String status = tbRoom.getValueAt(tbRoom.getSelectedRows()[0], 8).toString();
+	        String maCTT = tbRoom.getValueAt(tbRoom.getSelectedRows()[0], 1).toString();
+	        
+	        FormChiTietThue frmBookingNew;
+	        if (status.equals("Chưa xử lý")) {
+	            frmBookingNew = new FormChiTietThue(0, maCTT);
+	        } else {
+	            frmBookingNew = new FormChiTietThue(1, maCTT);
+	        }
+	        
+	        HomeForm form = (HomeForm) getParentForm(this);
+	        JPanel pnContent = form.panelChinh;
+	        pnContent.removeAll();
+	        pnContent.add(frmBookingNew);
+	        frmBookingNew.setVisible(true);
+	    } else {
+	        JOptionPane.showMessageDialog(null, "Vui lòng chọn phiếu thuê muốn xem chi tiết", "Thông báo", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+
+	private Container getParentForm(Container container) {
+	    if (container instanceof HomeForm) {
+	        return container;
+	    }
+	    return getParentForm(container.getParent());
+	}
+
+
 	
 	/**
 	 * Create the panel.
 	 */
-	public DanhSachThuePhong() {
+	public BookingList() {
 		setBounds(0, 0, 1251, 835);
 		setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -66,7 +163,7 @@ public class DanhSachThuePhong extends JPanel {
         
         JPanel pnl_frmDong1 = new JPanel();
         pnl_nhapThuePhong.add(pnl_frmDong1);
-        pnl_frmDong1.setLayout(new GridLayout(1, 4, 0, 0));
+        pnl_frmDong1.setLayout(new GridLayout(0, 5, 0, 0));
         
         JPanel pnl_maChiTietThue = new JPanel();
         pnl_maChiTietThue.setBackground(new Color(255, 255, 255));
@@ -82,12 +179,12 @@ public class DanhSachThuePhong extends JPanel {
         lbl_maChiTietThue.setFont(new Font("Tahoma", Font.BOLD, 12));
         pnl_maChiTietThue.add(lbl_maChiTietThue);
         
-        tf_maChiTietThue = new JTextField();
-        sl_pnl_maChiTietThue.putConstraint(SpringLayout.NORTH, tf_maChiTietThue, 9, SpringLayout.NORTH, pnl_maChiTietThue);
-        sl_pnl_maChiTietThue.putConstraint(SpringLayout.WEST, tf_maChiTietThue, 6, SpringLayout.EAST, lbl_maChiTietThue);
-        sl_pnl_maChiTietThue.putConstraint(SpringLayout.EAST, tf_maChiTietThue, -10, SpringLayout.EAST, pnl_maChiTietThue);
-        pnl_maChiTietThue.add(tf_maChiTietThue);
-        tf_maChiTietThue.setColumns(10);
+        txt_MaCTT = new JTextField();
+        sl_pnl_maChiTietThue.putConstraint(SpringLayout.NORTH, txt_MaCTT, 9, SpringLayout.NORTH, pnl_maChiTietThue);
+        sl_pnl_maChiTietThue.putConstraint(SpringLayout.WEST, txt_MaCTT, 6, SpringLayout.EAST, lbl_maChiTietThue);
+        sl_pnl_maChiTietThue.putConstraint(SpringLayout.EAST, txt_MaCTT, -10, SpringLayout.EAST, pnl_maChiTietThue);
+        pnl_maChiTietThue.add(txt_MaCTT);
+        txt_MaCTT.setColumns(10);
 
         JPanel pnl_maKhachHang = new JPanel();
         pnl_maKhachHang.setBackground(new Color(255, 255, 255));
@@ -102,12 +199,12 @@ public class DanhSachThuePhong extends JPanel {
         sl_pnl_maKhachHang.putConstraint(SpringLayout.WEST, lbl_maKhachHang, 10, SpringLayout.WEST, pnl_maKhachHang);
         pnl_maKhachHang.add(lbl_maKhachHang);
         
-        tf_maKhachHang = new JTextField();
-        sl_pnl_maKhachHang.putConstraint(SpringLayout.NORTH, tf_maKhachHang, -1, SpringLayout.NORTH, lbl_maKhachHang);
-        sl_pnl_maKhachHang.putConstraint(SpringLayout.WEST, tf_maKhachHang, 6, SpringLayout.EAST, lbl_maKhachHang);
-        sl_pnl_maKhachHang.putConstraint(SpringLayout.EAST, tf_maKhachHang, -10, SpringLayout.EAST, pnl_maKhachHang);
-        tf_maKhachHang.setColumns(10);
-        pnl_maKhachHang.add(tf_maKhachHang);
+        txt_MaKH = new JTextField();
+        sl_pnl_maKhachHang.putConstraint(SpringLayout.NORTH, txt_MaKH, -1, SpringLayout.NORTH, lbl_maKhachHang);
+        sl_pnl_maKhachHang.putConstraint(SpringLayout.WEST, txt_MaKH, 6, SpringLayout.EAST, lbl_maKhachHang);
+        sl_pnl_maKhachHang.putConstraint(SpringLayout.EAST, txt_MaKH, -10, SpringLayout.EAST, pnl_maKhachHang);
+        txt_MaKH.setColumns(10);
+        pnl_maKhachHang.add(txt_MaKH);
         
         JPanel pnl_tenKhachHang = new JPanel();
         pnl_tenKhachHang.setBackground(new Color(255, 255, 255));
@@ -122,12 +219,12 @@ public class DanhSachThuePhong extends JPanel {
         sl_pnl_tenKhachHang.putConstraint(SpringLayout.WEST, lbl_tenKhachHang, 10, SpringLayout.WEST, pnl_tenKhachHang);
         pnl_tenKhachHang.add(lbl_tenKhachHang);
         
-        tf_tenKhachHang = new JTextField();
-        sl_pnl_tenKhachHang.putConstraint(SpringLayout.NORTH, tf_tenKhachHang, 9, SpringLayout.NORTH, pnl_tenKhachHang);
-        sl_pnl_tenKhachHang.putConstraint(SpringLayout.WEST, tf_tenKhachHang, 6, SpringLayout.EAST, lbl_tenKhachHang);
-        sl_pnl_tenKhachHang.putConstraint(SpringLayout.EAST, tf_tenKhachHang, -10, SpringLayout.EAST, pnl_tenKhachHang);
-        tf_tenKhachHang.setColumns(10);
-        pnl_tenKhachHang.add(tf_tenKhachHang);
+        txt_TenKH = new JTextField();
+        sl_pnl_tenKhachHang.putConstraint(SpringLayout.NORTH, txt_TenKH, 9, SpringLayout.NORTH, pnl_tenKhachHang);
+        sl_pnl_tenKhachHang.putConstraint(SpringLayout.WEST, txt_TenKH, 6, SpringLayout.EAST, lbl_tenKhachHang);
+        sl_pnl_tenKhachHang.putConstraint(SpringLayout.EAST, txt_TenKH, -10, SpringLayout.EAST, pnl_tenKhachHang);
+        txt_TenKH.setColumns(10);
+        pnl_tenKhachHang.add(txt_TenKH);
         
         JPanel pnl_maNhanVien = new JPanel();
         pnl_maNhanVien.setBackground(new Color(255, 255, 255));
@@ -142,16 +239,36 @@ public class DanhSachThuePhong extends JPanel {
         sl_pnl_maNhanVien.putConstraint(SpringLayout.NORTH, lbl_maNhanVien, 10, SpringLayout.NORTH, pnl_maNhanVien);
         pnl_maNhanVien.add(lbl_maNhanVien);
         
-        tf_maNhanVien = new JTextField();
-        sl_pnl_maNhanVien.putConstraint(SpringLayout.NORTH, tf_maNhanVien, -1, SpringLayout.NORTH, lbl_maNhanVien);
-        sl_pnl_maNhanVien.putConstraint(SpringLayout.WEST, tf_maNhanVien, 6, SpringLayout.EAST, lbl_maNhanVien);
-        sl_pnl_maNhanVien.putConstraint(SpringLayout.EAST, tf_maNhanVien, -10, SpringLayout.EAST, pnl_maNhanVien);
-        tf_maNhanVien.setColumns(10);
-        pnl_maNhanVien.add(tf_maNhanVien);
+        txt_MaNV = new JTextField();
+        sl_pnl_maNhanVien.putConstraint(SpringLayout.NORTH, txt_MaNV, -1, SpringLayout.NORTH, lbl_maNhanVien);
+        sl_pnl_maNhanVien.putConstraint(SpringLayout.WEST, txt_MaNV, 6, SpringLayout.EAST, lbl_maNhanVien);
+        sl_pnl_maNhanVien.putConstraint(SpringLayout.EAST, txt_MaNV, -10, SpringLayout.EAST, pnl_maNhanVien);
+        txt_MaNV.setColumns(10);
+        pnl_maNhanVien.add(txt_MaNV);
+        
+        JPanel pnl_tenNhanVien = new JPanel();
+        pnl_frmDong1.add(pnl_tenNhanVien);
+        pnl_tenNhanVien.setBackground(new Color(255, 255, 255));
+        SpringLayout sl_pnl_tenNhanVien = new SpringLayout();
+        pnl_tenNhanVien.setLayout(sl_pnl_tenNhanVien);
+        
+        JLabel lbl_tenNhanVIen = new JLabel("Tên nhân viên");
+        sl_pnl_tenNhanVien.putConstraint(SpringLayout.EAST, lbl_tenNhanVIen, 115, SpringLayout.WEST, pnl_tenNhanVien);
+        lbl_tenNhanVIen.setFont(new Font("Tahoma", Font.BOLD, 12));
+        sl_pnl_tenNhanVien.putConstraint(SpringLayout.NORTH, lbl_tenNhanVIen, 10, SpringLayout.NORTH, pnl_tenNhanVien);
+        sl_pnl_tenNhanVien.putConstraint(SpringLayout.WEST, lbl_tenNhanVIen, 10, SpringLayout.WEST, pnl_tenNhanVien);
+        pnl_tenNhanVien.add(lbl_tenNhanVIen);
+        
+        tf_tenNhanVien = new JTextField();
+        sl_pnl_tenNhanVien.putConstraint(SpringLayout.NORTH, tf_tenNhanVien, -1, SpringLayout.NORTH, lbl_tenNhanVIen);
+        sl_pnl_tenNhanVien.putConstraint(SpringLayout.WEST, tf_tenNhanVien, 6, SpringLayout.EAST, lbl_tenNhanVIen);
+        sl_pnl_tenNhanVien.putConstraint(SpringLayout.EAST, tf_tenNhanVien, -10, SpringLayout.EAST, pnl_tenNhanVien);
+        tf_tenNhanVien.setColumns(10);
+        pnl_tenNhanVien.add(tf_tenNhanVien);
         
         JPanel pnl_frmDong2 = new JPanel();
         pnl_nhapThuePhong.add(pnl_frmDong2);
-        pnl_frmDong2.setLayout(new GridLayout(1, 5, 0, 0));
+        pnl_frmDong2.setLayout(new GridLayout(0, 5, 0, 0));
         
         JPanel pnl_tienCoc = new JPanel();
         pnl_tienCoc.setBackground(new Color(255, 255, 255));
@@ -166,11 +283,11 @@ public class DanhSachThuePhong extends JPanel {
         lbl_tienCoc.setFont(new Font("Tahoma", Font.BOLD, 12));
         pnl_tienCoc.add(lbl_tienCoc);
         
-        JComboBox cb_tienCoc = new JComboBox();
-        sl_pnl_tienCoc.putConstraint(SpringLayout.NORTH, cb_tienCoc, 8, SpringLayout.NORTH, pnl_tienCoc);
-        sl_pnl_tienCoc.putConstraint(SpringLayout.WEST, cb_tienCoc, 6, SpringLayout.EAST, lbl_tienCoc);
-        sl_pnl_tienCoc.putConstraint(SpringLayout.EAST, cb_tienCoc, 190, SpringLayout.EAST, lbl_tienCoc);
-        pnl_tienCoc.add(cb_tienCoc);
+        JComboBox cb_TienCoc = new JComboBox();
+        sl_pnl_tienCoc.putConstraint(SpringLayout.NORTH, cb_TienCoc, 8, SpringLayout.NORTH, pnl_tienCoc);
+        sl_pnl_tienCoc.putConstraint(SpringLayout.WEST, cb_TienCoc, 6, SpringLayout.EAST, lbl_tienCoc);
+        sl_pnl_tienCoc.putConstraint(SpringLayout.EAST, cb_TienCoc, 190, SpringLayout.EAST, lbl_tienCoc);
+        pnl_tienCoc.add(cb_TienCoc);
         
         JPanel pnl_tinhTrang = new JPanel();
         pnl_tinhTrang.setBackground(new Color(255, 255, 255));
@@ -185,11 +302,11 @@ public class DanhSachThuePhong extends JPanel {
         sl_pnl_tinhTrang.putConstraint(SpringLayout.WEST, lbl_tinhTrang, 10, SpringLayout.WEST, pnl_tinhTrang);
         pnl_tinhTrang.add(lbl_tinhTrang);
         
-        JComboBox cb_tinhTrang = new JComboBox();
-        sl_pnl_tinhTrang.putConstraint(SpringLayout.NORTH, cb_tinhTrang, -2, SpringLayout.NORTH, lbl_tinhTrang);
-        sl_pnl_tinhTrang.putConstraint(SpringLayout.WEST, cb_tinhTrang, 6, SpringLayout.EAST, lbl_tinhTrang);
-        sl_pnl_tinhTrang.putConstraint(SpringLayout.EAST, cb_tinhTrang, -10, SpringLayout.EAST, pnl_tinhTrang);
-        pnl_tinhTrang.add(cb_tinhTrang);
+        JComboBox cb_TinhTrangXuLy = new JComboBox();
+        sl_pnl_tinhTrang.putConstraint(SpringLayout.NORTH, cb_TinhTrangXuLy, -2, SpringLayout.NORTH, lbl_tinhTrang);
+        sl_pnl_tinhTrang.putConstraint(SpringLayout.WEST, cb_TinhTrangXuLy, 6, SpringLayout.EAST, lbl_tinhTrang);
+        sl_pnl_tinhTrang.putConstraint(SpringLayout.EAST, cb_TinhTrangXuLy, -10, SpringLayout.EAST, pnl_tinhTrang);
+        pnl_tinhTrang.add(cb_TinhTrangXuLy);
         
         JPanel pnl_ngayLapPhieu = new JPanel();
         pnl_ngayLapPhieu.setBackground(new Color(255, 255, 255));
@@ -203,49 +320,40 @@ public class DanhSachThuePhong extends JPanel {
         sl_pnl_ngayLapPhieu.putConstraint(SpringLayout.WEST, lbl_ngayLapPhieu, 10, SpringLayout.WEST, pnl_ngayLapPhieu);
         pnl_ngayLapPhieu.add(lbl_ngayLapPhieu);
         
-        JComboBox cb_ngayLapPhieu = new JComboBox();
-        sl_pnl_ngayLapPhieu.putConstraint(SpringLayout.NORTH, cb_ngayLapPhieu, -2, SpringLayout.NORTH, lbl_ngayLapPhieu);
-        sl_pnl_ngayLapPhieu.putConstraint(SpringLayout.WEST, cb_ngayLapPhieu, 26, SpringLayout.EAST, lbl_ngayLapPhieu);
-        sl_pnl_ngayLapPhieu.putConstraint(SpringLayout.EAST, cb_ngayLapPhieu, -10, SpringLayout.EAST, pnl_ngayLapPhieu);
-        pnl_ngayLapPhieu.add(cb_ngayLapPhieu);
+        dateTime_NgayLap = new JDateChooser();
+        sl_pnl_ngayLapPhieu.putConstraint(SpringLayout.NORTH, dateTime_NgayLap, -2, SpringLayout.NORTH, lbl_ngayLapPhieu);
+        sl_pnl_ngayLapPhieu.putConstraint(SpringLayout.WEST, dateTime_NgayLap, 26, SpringLayout.EAST, lbl_ngayLapPhieu);
+        sl_pnl_ngayLapPhieu.putConstraint(SpringLayout.EAST, dateTime_NgayLap, -10, SpringLayout.EAST, pnl_ngayLapPhieu);
+        pnl_ngayLapPhieu.add(dateTime_NgayLap);
         
-        JPanel pnl_tenNhanVien = new JPanel();
-        pnl_tenNhanVien.setBackground(new Color(255, 255, 255));
-        pnl_frmDong2.add(pnl_tenNhanVien);
-        SpringLayout sl_pnl_tenNhanVien = new SpringLayout();
-        pnl_tenNhanVien.setLayout(sl_pnl_tenNhanVien);
+        JPanel pnl_tenNhanVien_1 = new JPanel();
+        pnl_tenNhanVien_1.setBackground(Color.WHITE);
+        pnl_frmDong2.add(pnl_tenNhanVien_1);
+        pnl_tenNhanVien_1.setLayout(new SpringLayout());
         
-        JLabel lbl_tenNhanVIen = new JLabel("Tên nhân viên");
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.EAST, lbl_tenNhanVIen, 115, SpringLayout.WEST, pnl_tenNhanVien);
-        lbl_tenNhanVIen.setFont(new Font("Tahoma", Font.BOLD, 12));
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.NORTH, lbl_tenNhanVIen, 10, SpringLayout.NORTH, pnl_tenNhanVien);
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.WEST, lbl_tenNhanVIen, 10, SpringLayout.WEST, pnl_tenNhanVien);
-        pnl_tenNhanVien.add(lbl_tenNhanVIen);
+        JPanel pnl_tenNhanVien_2 = new JPanel();
+        pnl_tenNhanVien_2.setBackground(Color.WHITE);
+        pnl_frmDong2.add(pnl_tenNhanVien_2);
+        SpringLayout sl_pnl_tenNhanVien_2 = new SpringLayout();
+        pnl_tenNhanVien_2.setLayout(sl_pnl_tenNhanVien_2);
         
-        JButton btn_timKiem = new JButton("Tìm kiếm");
-        btn_timKiem.setForeground(new Color(255, 255, 255));
-        btn_timKiem.setBackground(new Color(123, 104, 238));
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.SOUTH, btn_timKiem, -10, SpringLayout.SOUTH, pnl_tenNhanVien);
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.EAST, btn_timKiem, -155, SpringLayout.EAST, pnl_tenNhanVien);
-        btn_timKiem.setFont(new Font("Tahoma", Font.BOLD, 12));
-        pnl_tenNhanVien.add(btn_timKiem);
+        JButton btnReset = new JButton("Làm mới");
+        sl_pnl_tenNhanVien_2.putConstraint(SpringLayout.WEST, btnReset, 133, SpringLayout.WEST, pnl_tenNhanVien_2);
+        sl_pnl_tenNhanVien_2.putConstraint(SpringLayout.SOUTH, btnReset, -10, SpringLayout.SOUTH, pnl_tenNhanVien_2);
+        sl_pnl_tenNhanVien_2.putConstraint(SpringLayout.EAST, btnReset, -10, SpringLayout.EAST, pnl_tenNhanVien_2);
+        btnReset.setForeground(Color.WHITE);
+        btnReset.setFont(new Font("Tahoma", Font.BOLD, 12));
+        btnReset.setBackground(new Color(123, 104, 238));
+        pnl_tenNhanVien_2.add(btnReset);
         
-        JButton btn_lamMoi = new JButton("Làm mới");
-        btn_lamMoi.setBackground(new Color(147, 112, 219));
-        btn_lamMoi.setForeground(new Color(255, 255, 255));
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.NORTH, btn_lamMoi, 0, SpringLayout.NORTH, btn_timKiem);
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.WEST, btn_lamMoi, 36, SpringLayout.EAST, btn_timKiem);
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.SOUTH, btn_lamMoi, -10, SpringLayout.SOUTH, pnl_tenNhanVien);
-        btn_lamMoi.setFont(new Font("Tahoma", Font.BOLD, 12));
-        pnl_tenNhanVien.add(btn_lamMoi);
-        
-        tf_tenNhanVien = new JTextField();
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.NORTH, btn_timKiem, 27, SpringLayout.SOUTH, tf_tenNhanVien);
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.NORTH, tf_tenNhanVien, -1, SpringLayout.NORTH, lbl_tenNhanVIen);
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.WEST, tf_tenNhanVien, 6, SpringLayout.EAST, lbl_tenNhanVIen);
-        sl_pnl_tenNhanVien.putConstraint(SpringLayout.EAST, tf_tenNhanVien, -10, SpringLayout.EAST, pnl_tenNhanVien);
-        tf_tenNhanVien.setColumns(10);
-        pnl_tenNhanVien.add(tf_tenNhanVien);
+        JButton btnSearch = new JButton("Tìm kiếm");
+        sl_pnl_tenNhanVien_2.putConstraint(SpringLayout.WEST, btnSearch, 10, SpringLayout.WEST, pnl_tenNhanVien_2);
+        sl_pnl_tenNhanVien_2.putConstraint(SpringLayout.SOUTH, btnSearch, -10, SpringLayout.SOUTH, pnl_tenNhanVien_2);
+        sl_pnl_tenNhanVien_2.putConstraint(SpringLayout.EAST, btnSearch, -20, SpringLayout.WEST, btnReset);
+        btnSearch.setForeground(Color.WHITE);
+        btnSearch.setFont(new Font("Tahoma", Font.BOLD, 12));
+        btnSearch.setBackground(new Color(147, 112, 219));
+        pnl_tenNhanVien_2.add(btnSearch);
         
         JPanel pnl_chiTietThuePhong = new JPanel();
         pnl_chiTietThuePhong.setBackground(new Color(255, 255, 255));
@@ -265,46 +373,57 @@ public class DanhSachThuePhong extends JPanel {
         String data[][] = {};
         
         
-        tbl_chiTietThuePhong = new JTable(data, column);
-        int[] columnWidths = {30, 120, 120, 180, 120, 150, 100, 100, 100}; // Độ rộng mong muốn cho từng cột
-		int columnIndex = 0;
-		for (int width : columnWidths) {
-		    TableColumn columnSize = tbl_chiTietThuePhong.getColumnModel().getColumn(columnIndex++);
-		    columnSize.setPreferredWidth(width);
-		}
-		tbl_chiTietThuePhong.setRowHeight(30);
-		
-		JTableHeader tableHeader = tbl_chiTietThuePhong.getTableHeader();
-		tableHeader.setPreferredSize(new Dimension(tableHeader.getWidth(), 30));
-		tableHeader.setBackground(Color.BLACK);
-		tableHeader.setForeground(Color.white);
-		
-		Font headerFont = new Font("Arial", Font.BOLD, 14); // Tạo font mới: Arial, đậm, kích thước 14
-		tableHeader.setFont(headerFont); 
-		
-		// Tùy chỉnh các tính chất khác của bảng
-		tbl_chiTietThuePhong.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		tbl_chiTietThuePhong.setShowGrid(false);
+        tbRoom = new JTable(data, column);
+        int[] columnWidths = {30, 120, 120, 180, 120, 150, 100, 100, 100}; 
+        int columnIndex = 0;
+        for (int width : columnWidths) {
+            TableColumn columnSize = tbRoom.getColumnModel().getColumn(columnIndex++);
+            columnSize.setPreferredWidth(width);
+        }
+        tbRoom.setRowHeight(30);
+        tbRoomModel = (DefaultTableModel)tbRoom.getModel();
+        
+        // Customize the table header
+        JTableHeader tableHeader = tbRoom.getTableHeader();
+        tableHeader.setPreferredSize(new Dimension(tableHeader.getWidth(), 30));
+        tableHeader.setBackground(Color.MAGENTA);
+        tableHeader.setForeground(Color.WHITE);
+        tableHeader.setReorderingAllowed(false);
+        
+        // Set font style and alignment for column headers
+        Font headerFont = new Font("Arial", Font.BOLD, 14);
+        tableHeader.setFont(headerFont);
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) tbRoom.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        headerRenderer.setVerticalAlignment(SwingConstants.CENTER);
+        headerRenderer.setText("<html><font color='white'>Name</font></html>"); // Change 'Name' to your column header text
+
+        // Customize other properties of the table
+        tbRoom.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        tbRoom.setShowGrid(false);
 		
         
-        JScrollPane scrp_chiTietThuePhong = new JScrollPane(tbl_chiTietThuePhong);
+        JScrollPane scrp_chiTietThuePhong = new JScrollPane(tbRoom);
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.NORTH, scrp_chiTietThuePhong, 6, SpringLayout.SOUTH, lbl_chiTietThuePhong);
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.WEST, scrp_chiTietThuePhong, 10, SpringLayout.WEST, pnl_chiTietThuePhong);
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.SOUTH, scrp_chiTietThuePhong, 437, SpringLayout.SOUTH, lbl_chiTietThuePhong);
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.EAST, scrp_chiTietThuePhong, 1221, SpringLayout.WEST, pnl_chiTietThuePhong);
         pnl_chiTietThuePhong.add(scrp_chiTietThuePhong);
 	
-        JButton btn_xemChiTiet = new JButton("Xem chi tiết");
-        btn_xemChiTiet.setBackground(new Color(147, 112, 219));
-        btn_xemChiTiet.setForeground(new Color(255, 255, 255));
-        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.NORTH, btn_xemChiTiet, 6, SpringLayout.SOUTH, scrp_chiTietThuePhong);
-        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.SOUTH, btn_xemChiTiet, -14, SpringLayout.SOUTH, pnl_chiTietThuePhong);
-        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.EAST, btn_xemChiTiet, -10, SpringLayout.EAST, pnl_chiTietThuePhong);
-        btn_xemChiTiet.setFont(new Font("Tahoma", Font.BOLD, 12));
+        JButton btnView = new JButton("Xem chi tiết");
+        btnView.setBackground(new Color(147, 112, 219));
+        btnView.setForeground(new Color(255, 255, 255));
+        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.NORTH, btnView, 6, SpringLayout.SOUTH, scrp_chiTietThuePhong);
+        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.SOUTH, btnView, -14, SpringLayout.SOUTH, pnl_chiTietThuePhong);
+        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.EAST, btnView, -10, SpringLayout.EAST, pnl_chiTietThuePhong);
+        btnView.setFont(new Font("Tahoma", Font.BOLD, 12));
         
 
-        pnl_chiTietThuePhong.add(btn_xemChiTiet);
+        pnl_chiTietThuePhong.add(btnView);
         
+        tbRoom.clearSelection();
+        HienThiDSChiTietThue();
+        dateTime_NgayLap.setDateFormatString(" ");
 	}
 }
 

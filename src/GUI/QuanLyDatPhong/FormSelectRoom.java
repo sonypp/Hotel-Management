@@ -51,6 +51,10 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class FormSelectRoom extends JPanel {
 
@@ -105,6 +109,12 @@ public class FormSelectRoom extends JPanel {
         panel.add(lblChiTietLoaiPhong);
         
         cbbCTLP = new JComboBox();
+        cbbCTLP.addItemListener(new ItemListener() {
+        	public void itemStateChanged(ItemEvent e) {
+        		if(check)
+        			search(listPhong);
+        	}
+        });
         cbbCTLP.setFont(new Font("Tahoma", Font.PLAIN, 13));
         cbbCTLP.setModel(new DefaultComboBoxModel(new String[] {"", "Phòng đơn", "Phòng đôi", "Phòng gia đình"}));
         cbbCTLP.setBounds(147, 15, 127, 21);
@@ -195,14 +205,21 @@ public class FormSelectRoom extends JPanel {
         panel.add(rdbtnKhac);
         
         JButton btnTimKiem = new JButton("Tìm kiếm");
+        btnTimKiem.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		btnFindRoom_Click();
+        	}
+        });
         btnTimKiem.setBackground(new Color(0, 128, 255));
         btnTimKiem.setFont(new Font("Segoe UI", Font.BOLD, 15));
         btnTimKiem.setBounds(869, 95, 117, 26);
         panel.add(btnTimKiem);
         
         JButton btnLamMoi = new JButton("Làm mới");
-        btnLamMoi.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
+        btnLamMoi.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
         		cbbCTLP.setSelectedIndex(0);
         		cbbGiaPhong.setSelectedIndex(0);
         		cbbHienTrang.setSelectedIndex(0);
@@ -423,6 +440,140 @@ public class FormSelectRoom extends JPanel {
         }
         dateNgayThue.setEnabled(!check);
 		dateNgayTra.setEnabled(!check);
+	}
+	
+	private void btnFindRoom_Click() {
+	    if (!rdbtnTheoNgay.isSelected() && !rdbtnTheoGio.isSelected() && !rdbtnKhac.isSelected()) {
+	        JOptionPane.showMessageDialog(this, "Lỗi chưa chọn dữ liệu\nVui lòng chọn hình thức thuê", "Thông báo", JOptionPane.ERROR_MESSAGE);
+	    } else {
+	        Date now = new Date();
+	        if (dateNgayThue.getDate().before(now)) {
+	            JOptionPane.showMessageDialog(this, "Ngày giờ thuê phải lớn hơn hoặc bằng ngày giờ hiện tại", "Thông báo", JOptionPane.ERROR_MESSAGE);
+	        } else {
+	            // Thuê theo ngày
+	            if (rdbtnTheoNgay.isSelected()) {
+	                if (dateNgayTra.getDate().compareTo(dateNgayThue.getDate()) <= 0) {
+	                    JOptionPane.showMessageDialog(this, "Ngày giờ trả phải lớn hơn ngày giờ thuê", "Thông báo", JOptionPane.ERROR_MESSAGE);
+	                } else {
+	                    SetEnable(true);
+	                    ChiTietThuePhongBUS cttPhong = new ChiTietThuePhongBUS();
+	                    ChiTietThueBUS ctt = new ChiTietThueBUS();
+	                    PhongBUS phong = new PhongBUS();
+
+	                    List<ChiTietThuePhongDTO> cttList = cttPhong.GetDSListCTTP();
+	                    List<ChiTietThueDTO> ctThueList = ctt.getDSChiTietThue();
+	                    List<PhongDTO> phongList = phong.getListPhong_DTO();
+
+	                    List<PhongDTO> cttFiltered = new ArrayList<>();
+	                    for (ChiTietThuePhongDTO cttp : cttList) {
+	                        for (ChiTietThueDTO ct : ctThueList) {
+	                            if (cttp.getMaCTT().equals(ct.getMaCTT()) && cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
+	                                    && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)) {
+	                                cttFiltered.add(phongList.stream()
+	                                        .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0
+	                                                && !cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
+	                                        .findFirst().orElse(null));
+	                            }
+	                        }
+	                    }
+
+	                    List<PhongDTO> roomsValid = phongList.stream()
+	                            .filter(room -> room.getTinhTrang() == 0)
+	                            .filter(room -> cttFiltered.stream().noneMatch(ct -> ct.getMaP().equals(room.getMaP())))
+	                            .collect(Collectors.toList());
+
+	                    listPhong.clear();
+	                    listPhong.addAll(roomsValid);
+	                    setListPhong(listPhong);
+	                }
+	            }
+	            // Thuê theo giờ
+	            else if (rdbtnTheoGio.isSelected()) {
+	                if (dateNgayTra.getDate().compareTo(dateNgayThue.getDate()) <= 0) {
+	                    JOptionPane.showMessageDialog(this, "Ngày giờ trả phải lớn hơn ngày giờ thuê", "Thông báo", JOptionPane.ERROR_MESSAGE);
+	                } else {
+	                    long diffInMillis = dateNgayTra.getDate().getTime() - dateNgayThue.getDate().getTime();
+	                    long diffInHours = TimeUnit.MILLISECONDS.toHours(diffInMillis);
+
+	                    if (diffInMillis > 0 && diffInHours < 1) {
+	                        JOptionPane.showMessageDialog(this, "Có lẽ bạn muốn thuê theo ngày vui lòng kiểm tra lại", "Thông báo", JOptionPane.WARNING_MESSAGE);
+	                    } else if (diffInMillis == 0 && diffInHours < 1) {
+	                        JOptionPane.showMessageDialog(this, "Vui lòng thuê ít nhất 1 giờ", "Thông báo", JOptionPane.ERROR_MESSAGE);
+	                    } else {
+	                        SetEnable(true);
+	                        ChiTietThuePhongBUS cttPhong = new ChiTietThuePhongBUS();
+	                        ChiTietThueBUS ctt = new ChiTietThueBUS();
+	                        PhongBUS phong = new PhongBUS();
+
+	                        List<ChiTietThuePhongDTO> cttList = cttPhong.GetDSListCTTP();
+	                        List<ChiTietThueDTO> ctThueList = ctt.getDSChiTietThue();
+	                        List<PhongDTO> phongList = phong.getListPhong_DTO();
+
+	                        List<PhongDTO> cttFiltered = new ArrayList<>();
+	                        for (ChiTietThuePhongDTO cttp : cttList) {
+	                            for (ChiTietThueDTO ct : ctThueList) {
+	                                if (cttp.getMaCTT().equals(ct.getMaCTT()) && cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
+	                                        && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)) {
+	                                    cttFiltered.add(phongList.stream()
+	                                            .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0
+	                                                    && !cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
+	                                            .findFirst().orElse(null));
+	                                }
+	                            }
+	                        }
+
+	                        List<PhongDTO> roomsValid = phongList.stream()
+	                                .filter(room -> room.getTinhTrang() == 0)
+	                                .filter(room -> cttFiltered.stream().noneMatch(ct -> ct.getMaP().equals(room.getMaP())))
+	                                .collect(Collectors.toList());
+
+	                        listPhong.clear();
+	                        listPhong.addAll(roomsValid);
+	                        setListPhong(listPhong);
+	                    }
+	                }
+	            }
+	            // Thuê chưa xác định ngày trả
+	            else {
+	                SetEnable(true);
+	                ChiTietThuePhongBUS cttPhong = new ChiTietThuePhongBUS();
+	                ChiTietThueBUS ctt = new ChiTietThueBUS();
+	                PhongBUS phong = new PhongBUS();
+
+	                List<ChiTietThuePhongDTO> cttList = cttPhong.GetDSListCTTP();
+	                List<ChiTietThueDTO> ctThueList = ctt.getDSChiTietThue();
+	                List<PhongDTO> phongList = phong.getListPhong_DTO();
+
+	                List<PhongDTO> cttFiltered = cttList.stream()
+	                        .flatMap(cttp -> ctThueList.stream()
+	                                .filter(ct -> cttp.getMaCTT().equals(ct.getMaCTT()))
+	                                .map(ct -> new Object[]{cttp, ct}))
+	                        .flatMap(arr -> phongList.stream()
+	                                .filter(room -> ((ChiTietThuePhongDTO) arr[0]).getMaP().equals(room.getMaP()))
+	                                .map(room -> new Object[]{arr[0], arr[1], room}))
+	                        .filter(arr -> {
+	                            ChiTietThuePhongDTO cttp = (ChiTietThuePhongDTO) arr[0];
+	                            ChiTietThueDTO ct = (ChiTietThueDTO) arr[1];
+	                            PhongDTO room = (PhongDTO) arr[2];
+	                            return ct.getTinhTrangXuLy() == 0 &&
+	                                    ((cttp.getNgayThue().compareTo(dateNgayThue.getDate()) <= 0 &&
+	                                            (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null))
+	                                            || cttp.getNgayThue().compareTo(dateNgayThue.getDate()) >= 0);
+	                        })
+	                        .map(arr -> (PhongDTO) arr[2])
+	                        .collect(Collectors.toList());
+
+	                List<PhongDTO> roomsValid = phongList.stream()
+	                        .filter(room -> room.getTinhTrang() == 0)
+	                        .filter(room -> cttFiltered.stream().noneMatch(ct -> ct.getMaP().equals(room.getMaP())))
+	                        .collect(Collectors.toList());
+
+	                listPhong.clear();
+	                listPhong.addAll(roomsValid);
+	                setListPhong(listPhong);
+	            }
+	        }
+	    }
 	}
 
 }

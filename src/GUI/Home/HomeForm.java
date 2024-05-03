@@ -17,7 +17,9 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
+import com.toedter.calendar.JCalendar;
 
+import BUS.ChucNangBUS;
 import DTO.NhanVienDTO;
 
 import javax.swing.border.CompoundBorder;
@@ -31,8 +33,8 @@ import GUI.KhachHang.PanelCus;
 import GUI.NhanVien.PanelStaff;
 import GUI.PhanQuyen.PanelPosition;
 import GUI.Phong.QLPHONGPanel;
-import GUI.QuanLyDatPhong.DanhSachThuePhong;
-import GUI.QuanLyDatPhong.TaoPhieuDatPhong;
+import GUI.QuanLyDatPhong.BookingList;
+import GUI.QuanLyDatPhong.BookingNew;
 import GUI.ThongKe.XemThongKe;
 import GUI.TienIch.QLTienIch;
 
@@ -46,6 +48,8 @@ import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
@@ -57,10 +61,12 @@ import java.awt.FlowLayout;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import java.awt.SystemColor;
 
 public class HomeForm extends JFrame {
 	
 	public static NhanVienDTO nhanVien;
+	public ChucNangBUS cnBUS = new ChucNangBUS();
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -75,12 +81,11 @@ public class HomeForm extends JFrame {
 	private JButton btnQLTienIch;
 	private JButton btnDSDatPhong;
 	private JButton btnQLKhachHang;
-	private JPanel panelChinh = new JPanel();
+	public JPanel panelChinh = new JPanel();
 	
 	private URL urlMHC = HomeForm.class.getResource("MHC.png");
 	private URL urlQLP = HomeForm.class.getResource("bedroom.png");
 	private URL urlQLKH = HomeForm.class.getResource("client.png");
-	private URL urlHome = HomeForm.class.getResource("pnghome.png");
 	private URL urlQLDV = HomeForm.class.getResource("dichvu24.png");
 	private URL urlQLNV = HomeForm.class.getResource("nhanvien.png");
 	private URL urlQLPQ = HomeForm.class.getResource("phanquyen.png");
@@ -90,28 +95,14 @@ public class HomeForm extends JFrame {
 	private URL urlTI = HomeForm.class.getResource("tienIch.png");
 	private URL urlDSDP = HomeForm.class.getResource("DSDatPhong.png");
 	private URL urlhotel = HomeForm.class.getResource("hotel.png");
-	private JLabel lblHome = new JLabel("");
-	/**
-	 * Launch the application.
-	 * @throws UnsupportedLookAndFeelException 
-	 */
-	public static void main(String[] args) throws UnsupportedLookAndFeelException  {
-		UIManager.setLookAndFeel(new FlatMacLightLaf());
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					HomeForm frame = new HomeForm();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private URL urlXinChao = HomeForm.class.getResource("XinChao.png");
+	private URL urlHa1 = HomeForm.class.getResource("ha1.png");
+	private URL urlHa2 = HomeForm.class.getResource("ha2.png");
+	private URL urlHa3 = HomeForm.class.getResource("ha3.png");
+	private URL urlHa4 = HomeForm.class.getResource("ha4.png");
 
-	/**
-	 * Create the frame.
-	 */
+	private JLabel lblXinChao;
+
 	
 	public HomeForm() {
 		setBackground(new Color(255, 255, 255));
@@ -121,27 +112,22 @@ public class HomeForm extends JFrame {
 		setBounds(100, 100, 1920, 1080);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		contentPane = new JPanel();
-		contentPane.setBackground(new Color(255, 255, 255));
+		contentPane.setBackground(SystemColor.control);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		JPanel panelMenu = new JPanel();
-		panelMenu.setBounds(10, 10, 237, 839);
+		panelMenu.setBounds(10, 73, 237, 776);
 		panelMenu.setBackground(new Color(255, 255, 255));
 		contentPane.add(panelMenu);
 		
-		btnQLKhachHang = new JButton("Quản lý khách hàng                         ");
+		btnQLKhachHang = new JButton("Quản lý khách hàng                            ");
 		btnQLKhachHang.setHorizontalAlignment(SwingConstants.LEFT);
 		btnQLKhachHang.setBackground(new Color(255, 255, 255));
 		
 		panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
+		panelMenu.add(Box.createVerticalStrut(10));
 		
-		JLabel lblNewLabel_1 = new JLabel("LUXURY HOTEL");
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		lblNewLabel_1.setBackground(new Color(255, 255, 255));
-		lblNewLabel_1.setIcon(new ImageIcon(urlhotel));
-		panelMenu.add(lblNewLabel_1);
-		panelMenu.add(Box.createVerticalStrut(20));
 		
 
 		
@@ -152,7 +138,8 @@ public class HomeForm extends JFrame {
 		btnManHinhChinh.setIcon(new ImageIcon(urlMHC));
 		btnManHinhChinh.setBorder(null);
 		panelMenu.add(btnManHinhChinh);
-		panelMenu.add(Box.createVerticalStrut(10));
+		btnManHinhChinh.setHorizontalAlignment(SwingConstants.LEFT);
+
 		
 		btnManHinhChinh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -161,7 +148,7 @@ public class HomeForm extends JFrame {
 					RefreshButton();
 					btnManHinhChinh.setBackground(Color.GRAY);
 				  	panelChinh.removeAll(); // Xóa các thành phần cũ trong panelChinh
-				  	panelChinh.add(lblHome); // Thêm QLPHONGPanel vào panelChinh
+				  	
 				  	panelChinh.revalidate(); // Cập nhật lại panelChinh
 				  	panelChinh.repaint(); // Vẽ lại panelChinh
 			}
@@ -187,12 +174,10 @@ public class HomeForm extends JFrame {
 	        });
 		
 		
-		btnQLPhng = new JButton("Quản lý phòng                                  ");
+		btnQLPhng = new JButton("Quản lý phòng                                    ");
 		btnQLPhng.setHorizontalAlignment(SwingConstants.LEFT);
 		btnQLPhng.setBackground(new Color(255, 255, 255));
 		btnQLPhng.setBorder(null);
-		panelMenu.add(btnQLPhng);
-		panelMenu.add(Box.createVerticalStrut(10));
 		btnQLPhng.setIcon(new ImageIcon(urlQLP));
 		
 		btnQLPhng.addActionListener(new ActionListener() {
@@ -228,7 +213,7 @@ public class HomeForm extends JFrame {
             }
         });
 		
-		btnQLTienIch = new JButton("Quản lý tiện ích                                 ");
+		btnQLTienIch = new JButton("Quản lý tiện ích                                   ");
 		btnQLTienIch.setHorizontalAlignment(SwingConstants.LEFT);
 		btnQLTienIch.setIcon(new ImageIcon(urlTI));
 		btnQLTienIch.setBackground(new Color(255, 255, 255));
@@ -264,12 +249,11 @@ public class HomeForm extends JFrame {
                 btnQLTienIch.setBackground(null); // Khôi phục màu nền khi di chuột ra khỏi nút
             }
         });
-		panelMenu.add(btnQLTienIch);
-		panelMenu.add(Box.createVerticalStrut(10));
+
 		
 				
 				
-				btnQLDichvu = new JButton("Quản lý dịch vụ                                ");
+				btnQLDichvu = new JButton("Quản lý dịch vụ                                   ");
 				
 					btnQLDichvu.setHorizontalAlignment(SwingConstants.LEFT);
 					btnQLDichvu.setIcon(new ImageIcon(urlQLDV));
@@ -307,28 +291,71 @@ public class HomeForm extends JFrame {
                 btnQLDichvu.setBackground(null); // Khôi phục màu nền khi di chuột ra khỏi nút
             }
         });
-					panelMenu.add(btnQLDichvu);
-					panelMenu.add(Box.createVerticalStrut(10));
+
 		btnQLKhachHang.setIcon(new ImageIcon(urlQLKH));
 		btnQLKhachHang.setBorder(null);
-		panelMenu.add(btnQLKhachHang);
-		panelMenu.add(Box.createVerticalStrut(10));
-		
-		
-		
+
 		
 		panelChinh.setBackground(new Color(255, 255, 255));
 		panelChinh.setForeground(new Color(0, 255, 255));
-		panelChinh.setBounds(252, 10, 1288, 839);
+		panelChinh.setBounds(253, 73, 1310, 822);
 		contentPane.add(panelChinh);
 		panelChinh.setLayout(null);
 		
+		JPanel panelLich = new JPanel();
+		panelLich.setBounds(10, 316, 263, 445);
+		panelChinh.add(panelLich);
 		
-		lblHome.setBackground(new Color(255, 255, 255));
+		JCalendar calendar = new JCalendar();
+		panelLich.setLayout(new BorderLayout());
+
+
+		panelLich.add(calendar, BorderLayout.CENTER);
 		
-		lblHome.setIcon(new ImageIcon(urlHome));
-		lblHome.setBounds(10, 10, 1268, 815);
-		panelChinh.add(lblHome);
+		JPanel panelMaps = new JPanel();
+		panelMaps.setBounds(283, 315, 1017, 446);
+		panelChinh.add(panelMaps);
+		
+		JLabel lblHinhAnh = new JLabel("");
+		lblHinhAnh.setBounds(10, 10, 1283, 295);
+		panelChinh.add(lblHinhAnh);
+		
+		JLabel lblHa1 = new JLabel("New label");
+		lblHa1.setBounds(10, 10, 275, 295);
+		lblHa1.setIcon(new ImageIcon(urlHa1));
+		panelChinh.add(lblHa1);
+		
+		JLabel lblHa2 = new JLabel("New label");
+		lblHa2.setBounds(283, 10, 304, 295);
+		lblHa2.setIcon(new ImageIcon(urlHa2));
+		panelChinh.add(lblHa2);
+		
+		JLabel lblHa3 = new JLabel("New label");
+		lblHa3.setBounds(593, 10, 304, 295);
+		lblHa3.setIcon(new ImageIcon(urlHa3));
+		panelChinh.add(lblHa3);
+		
+		JLabel lblHa4 = new JLabel("New label");
+		lblHa4.setBounds(907, 10, 393, 295);
+		lblHa4.setIcon(new ImageIcon(urlHa4));
+		panelChinh.add(lblHa4);
+		lblXinChao = new JLabel("Xin chào ");
+		lblXinChao.setBackground(new Color(240, 240, 240));
+		lblXinChao.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
+		lblXinChao.setBounds(1069, 10, 388, 40);
+		contentPane.add(lblXinChao);
+		
+		JLabel lblNewLabel_1 = new JLabel("LUXURY HOTEL");
+		lblNewLabel_1.setBounds(10, 10, 237, 64);
+		contentPane.add(lblNewLabel_1);
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblNewLabel_1.setBackground(new Color(255, 255, 255));
+		lblNewLabel_1.setIcon(new ImageIcon(urlhotel));
+		
+		JLabel lbliconXinChao = new JLabel("");
+		lbliconXinChao.setBounds(1474, 10, 56, 40);
+		lbliconXinChao.setIcon(new ImageIcon(urlXinChao));
+		contentPane.add(lbliconXinChao);
 		
 		
 		
@@ -404,10 +431,9 @@ public class HomeForm extends JFrame {
                 btnQLNV.setBackground(null); // Khôi phục màu nền khi di chuột ra khỏi nút
             }
         });
-		panelMenu.add(btnQLNV);
-		panelMenu.add(Box.createVerticalStrut(10));
+
 		
-		btnQLPhanQuyen = new JButton("Quản lý phân quyền                         ");
+		btnQLPhanQuyen = new JButton("Quản lý phân quyền                            ");
 		btnQLPhanQuyen.setHorizontalAlignment(SwingConstants.LEFT);
 		
 		btnQLPhanQuyen.setIcon(new ImageIcon(urlQLPQ));
@@ -446,8 +472,7 @@ public class HomeForm extends JFrame {
                 btnQLPhanQuyen.setBackground(null); // Khôi phục màu nền khi di chuột ra khỏi nút
             }
         });
-		panelMenu.add(btnQLPhanQuyen);
-		panelMenu.add(Box.createVerticalStrut(10));
+
 		
 		
 		btnDSDatPhong = new JButton("Danh sách đặt phòng                           ");
@@ -458,7 +483,7 @@ public class HomeForm extends JFrame {
 		btnDSDatPhong.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnDSDatPhong.setFocusPainted(false);
-				DanhSachThuePhong DSDatPhong = new DanhSachThuePhong();
+				BookingList DSDatPhong = new BookingList();
 				RefreshButton();
 				btnDSDatPhong.setBackground(Color.GRAY);
 			  	panelChinh.removeAll(); // Xóa các thành phần cũ trong panelChinh
@@ -487,7 +512,7 @@ public class HomeForm extends JFrame {
             }
         });
 		
-		btnDatPhongMoi = new JButton("Đặt phòng mới                                  ");
+		btnDatPhongMoi = new JButton("Đặt phòng mới                                     ");
 		btnDatPhongMoi.setHorizontalAlignment(SwingConstants.LEFT);
 		btnDatPhongMoi.setIcon(new ImageIcon(urlDPM));
 		btnDatPhongMoi.setBackground(new Color(255, 255, 255));
@@ -495,7 +520,7 @@ public class HomeForm extends JFrame {
 		btnDatPhongMoi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnDatPhongMoi.setFocusPainted(false);
-				TaoPhieuDatPhong PhieuDatPhong = new TaoPhieuDatPhong();
+				BookingNew PhieuDatPhong = new BookingNew();
 				RefreshButton();
 				btnDatPhongMoi.setBackground(Color.GRAY);
 			  	panelChinh.removeAll(); // Xóa các thành phần cũ trong panelChinh
@@ -523,13 +548,10 @@ public class HomeForm extends JFrame {
                 btnDatPhongMoi.setBackground(null); // Khôi phục màu nền khi di chuột ra khỏi nút
             }
         });
-		panelMenu.add(btnDatPhongMoi);
-		panelMenu.add(Box.createVerticalStrut(10));
-		panelMenu.add(btnDSDatPhong);
-		panelMenu.add(Box.createVerticalStrut(10));
+
 		
 		
-		btnThongKe = new JButton("Thống kê                                           ");
+		btnThongKe = new JButton("Thống kê                                             ");
 		btnThongKe.setHorizontalAlignment(SwingConstants.LEFT);
 		
 		btnThongKe.setIcon(new ImageIcon(urlTK));
@@ -603,12 +625,91 @@ public class HomeForm extends JFrame {
                 btnQLHoaDon.setBackground(null); // Khôi phục màu nền khi di chuột ra khỏi nút
             }
         });
-		panelMenu.add(btnQLHoaDon);
-		panelMenu.add(Box.createVerticalStrut(10));
-		panelMenu.add(btnThongKe);
-		panelMenu.add(Box.createVerticalStrut(10));
+
 		
+			
+		if (nhanVien != null) {
+		    int chucVu = nhanVien.getChucVu();
+		    String strchucVu = String.valueOf(chucVu);
+		    ResultSet ChucNang = cnBUS.QuyenQuanLy(strchucVu);
+		    panelMenu.add(Box.createVerticalStrut(10));
+		    
+		    try {
+		    	while(ChucNang.next()) {
+		    		var maCN = ChucNang.getString(1);
+		    		if(maCN.equals("1"))
+		    		{
+		    			panelMenu.add(btnQLPhng);
+		    			panelMenu.add(Box.createVerticalStrut(10));
+		    			panelMenu.add(btnQLTienIch);
+		    			panelMenu.add(Box.createVerticalStrut(10));
+		    		}
+		    		if(maCN.equals("2"))
+		    		{
+		    			panelMenu.add(btnQLDichvu); 
+		    			panelMenu.add(Box.createVerticalStrut(10));
+		    		}
+		    		
+		    		if(maCN.equals("3"))
+		    		{
+		    			panelMenu.add(btnQLKhachHang);
+		    			panelMenu.add(Box.createVerticalStrut(10));
+		    		}
+		    		 	
+	    			if(maCN.equals("4"))
+	    			{
+	    				panelMenu.add(btnQLNV);
+	    				panelMenu.add(Box.createVerticalStrut(10));
+	    			}
+	    				
+	    			if(maCN.equals("5"))
+	    			{
+	    				panelMenu.add(btnQLPhanQuyen);
+	    				panelMenu.add(Box.createVerticalStrut(10));
+	    			}
+	    				
+	    			if(maCN.equals("6"))
+	    			{
+	    				panelMenu.add(btnDatPhongMoi);
+	    				panelMenu.add(Box.createVerticalStrut(10));
+	    				panelMenu.add(btnDSDatPhong);
+	    				panelMenu.add(Box.createVerticalStrut(10));
+	    			}
+	    				
+	    			if(maCN.equals("7"))
+	    			{
+	    				panelMenu.add(btnQLHoaDon);
+	    				panelMenu.add(Box.createVerticalStrut(10));
+	    			}
+	    				
+	    			if(maCN.equals("8"))
+	    			{
+	    				panelMenu.add(btnThongKe);
+	    				panelMenu.add(Box.createVerticalStrut(10));
+	    			}
+	    				
+		    	}
+		    } catch (SQLException e1) {
+		    	// TODO Auto-generated catch block
+		    	e1.printStackTrace();
+		    }
+		    ResultSet tenChucVu = cnBUS.getTenPQ(strchucVu);
+		    String ten = nhanVien.getTenNV();
+		    try {
+				if (tenChucVu.next()) {
+				    String tenPQ = tenChucVu.getString("tenPQ");
+				    lblXinChao.setText("Xin chào " + tenPQ + " " + ten);
+				    lblXinChao.setHorizontalAlignment(SwingConstants.RIGHT); // Đặt căn chỉnh từ phải qua trái
+
+				}
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	
+		
+		
 	}
 	private void RefreshButton() {
 		 btnManHinhChinh.setBackground(null);
@@ -623,6 +724,7 @@ public class HomeForm extends JFrame {
 		 btnDSDatPhong.setBackground(null);
 		 btnQLKhachHang.setBackground(null);
 	}
+	
 	
 }
 	

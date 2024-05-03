@@ -179,7 +179,6 @@ public class PanelPosition extends JPanel {
 				        String maNV = tableDSNV.getValueAt(row, 1).toString();
 			            String tenNV = tableDSNV.getValueAt(row, 2).toString();
 			            String pq = tableDSNV.getValueAt(row, 3).toString();
-			            String tenTK = tableDSNV.getValueAt(row, 4).toString();
 			            String TT = tableDSNV.getValueAt(row, 5).toString();
 			            
 			            
@@ -215,6 +214,7 @@ public class PanelPosition extends JPanel {
 				    
 				        if (column == 7) 
 				        {
+				        	String tenTK = tableDSNV.getValueAt(row, 4).toString();
 				        	JPopupMenu popupMenu = new JPopupMenu();
 				            JMenuItem menuItemKhoaTaiKhoan = new JMenuItem("Khóa tài khoản");
 				            JMenuItem menuItemMoKhoa = new JMenuItem("Mở khóa");
@@ -303,14 +303,18 @@ public class PanelPosition extends JPanel {
 		            }
 		            if(TT.equals("Chưa thiết lập"))
 		            {
-				        
-			            popupMenu.add(menuItemPhanQuyen);
-			            popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				        JOptionPane.showMessageDialog(null, "Bạn phải tạo tài khoản trước");
 		            }
 				}
 		        }
 			     
 			if(column == 8) {
+				String TT = tableDSNV.getValueAt(row, 5).toString();
+				if(TT.equals("Chưa thiết lập"))
+	            {
+			        JOptionPane.showMessageDialog(null, "Bạn phải tạo tài khoản trước");
+			        return;
+	            }
 				int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa tài khoản này không?", "Xác nhận xóa tài khoản", JOptionPane.YES_NO_OPTION);
 				if (confirm == JOptionPane.YES_OPTION) {
 					String taiKhoan = tableDSNV.getValueAt(row, 4).toString();

@@ -1,10 +1,11 @@
 package GUI.QuanLyDatPhong;
 
-import java.awt.Color;
 import java.util.*;
+import java.util.List;
 import java.awt.*;
 
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,10 +19,11 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -39,6 +41,7 @@ import com.toedter.calendar.JDateChooser;
 import BUS.ChiTietThueBUS;
 import BUS.ChiTietThuePhongBUS;
 import BUS.KhachHangBUS;
+import BUS.PhongBUS;
 import DTO.KhachHangDTO;
 import DTO.PhongDTO;
 import GUI.Home.HomeForm;
@@ -49,8 +52,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.InputMethodEvent;
 
-public class PhieuDatPhong extends JPanel {
+public class FormBookingNew extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField txtMaCTT;
@@ -88,7 +92,7 @@ public class PhieuDatPhong extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public PhieuDatPhong() {
+	public FormBookingNew() {
 		setBounds(0, 0, 1251, 835);
 		setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -204,12 +208,23 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_1);
         
         txtHoTenKH = new JTextField();
-        txtHoTenKH.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		checkTenKH();
-        	}
-        });
         txtHoTenKH.setEnabled(false);
+        txtHoTenKH.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	 @Override
+             public void insertUpdate(DocumentEvent e) {
+                 checkTenKH();
+             }
+
+             @Override
+             public void removeUpdate(DocumentEvent e) {
+                 checkTenKH();
+             }
+             
+             @Override
+             public void changedUpdate(DocumentEvent e) {
+                 // Not needed for plain text fields
+             }
+        });
         txtHoTenKH.setColumns(10);
         txtHoTenKH.setBounds(247, 71, 162, 26);
         panel.add(txtHoTenKH);
@@ -220,10 +235,21 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_2);
         
         txtCMND = new JTextField();
-        txtCMND.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		txtCMND_TextChanged();
-        	}
+        txtCMND.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	@Override
+            public void insertUpdate(DocumentEvent e) {
+                txtCMND_TextChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                txtCMND_TextChanged();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Not needed for plain text fields
+            }
         });
         txtCMND.setColumns(10);
         txtCMND.setBounds(509, 71, 162, 26);
@@ -235,10 +261,21 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_3);
         
         txtSDT = new JTextField();
-        txtSDT.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		txtSDT_TextChanged(e);
-        	}
+        txtSDT.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	@Override
+            public void insertUpdate(DocumentEvent e) {
+                txtSDT_TextChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                txtSDT_TextChanged();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Not needed for plain text fields
+            }
         });
         txtSDT.setEnabled(false);
         txtSDT.setColumns(10);
@@ -293,10 +330,21 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_5_1_1);
         
         txtDuong = new JTextField();
-        txtDuong.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		txtDuong_TextChanged(e);
-        	}
+        txtDuong.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	@Override
+            public void insertUpdate(DocumentEvent e) {
+                txtDuong_TextChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+            	txtDuong_TextChanged();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Not needed for plain text fields
+            }
         });
         txtDuong.setEnabled(false);
         txtDuong.setBounds(303, 167, 67, 26);
@@ -309,10 +357,21 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_5_1_2);
         
         txtPhuong = new JTextField();
-        txtPhuong.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		txtDuong_TextChanged(e);
-        	}
+        txtPhuong.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	@Override
+            public void insertUpdate(DocumentEvent e) {
+                txtDuong_TextChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+            	txtDuong_TextChanged();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Not needed for plain text fields
+            }
         });
         txtPhuong.setEnabled(false);
         txtPhuong.setColumns(10);
@@ -325,10 +384,21 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_5_1_2_1);
         
         txtQuan = new JTextField();
-        txtQuan.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		txtDuong_TextChanged(e);
-        	}
+        txtQuan.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	@Override
+            public void insertUpdate(DocumentEvent e) {
+                txtDuong_TextChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+            	txtDuong_TextChanged();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Not needed for plain text fields
+            }
         });
         txtQuan.setEnabled(false);
         txtQuan.setColumns(10);
@@ -341,10 +411,21 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_5_1_2_1_1);
         
         txtQuocTich = new JTextField();
-        txtQuocTich.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		checkQuocTich();
-        	}
+        txtQuocTich.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	@Override
+            public void insertUpdate(DocumentEvent e) {
+                checkQuocTich();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+            	checkQuocTich();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Not needed for plain text fields
+            }
         });
         txtQuocTich.setEnabled(false);
         txtQuocTich.setColumns(10);
@@ -357,10 +438,21 @@ public class PhieuDatPhong extends JPanel {
         panel.add(lblNewLabel_3_5_1_2_1_2);
         
         txtTinhThanh = new JTextField();
-        txtTinhThanh.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		txtDuong_TextChanged(e);
-        	}
+        txtTinhThanh.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        	@Override
+            public void insertUpdate(DocumentEvent e) {
+                txtDuong_TextChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+            	txtDuong_TextChanged();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Not needed for plain text fields
+            }
         });
         txtTinhThanh.setEnabled(false);
         txtTinhThanh.setColumns(10);
@@ -371,36 +463,42 @@ public class PhieuDatPhong extends JPanel {
         lblErrorTenKH.setFont(new Font("Tahoma", Font.PLAIN, 10));
         lblErrorTenKH.setForeground(new Color(255, 0, 0));
         lblErrorTenKH.setBounds(247, 96, 162, 20);
+        lblErrorTenKH.setVisible(false);
         panel.add(lblErrorTenKH);
         
         lblErrorCMND = new JLabel("CCCD/CMND không được để trống");
         lblErrorCMND.setForeground(Color.RED);
         lblErrorCMND.setFont(new Font("Tahoma", Font.PLAIN, 10));
         lblErrorCMND.setBounds(509, 96, 162, 20);
+        lblErrorCMND.setVisible(false);
         panel.add(lblErrorCMND);
         
         lblErrorSDT = new JLabel("SĐT không được để trống");
         lblErrorSDT.setForeground(Color.RED);
         lblErrorSDT.setFont(new Font("Tahoma", Font.PLAIN, 10));
         lblErrorSDT.setBounds(746, 96, 162, 20);
+        lblErrorSDT.setVisible(false);
         panel.add(lblErrorSDT);
         
         lblErrorNgaySinh = new JLabel("Ngày sinh không đủ 18 tuổi");
         lblErrorNgaySinh.setForeground(Color.RED);
         lblErrorNgaySinh.setFont(new Font("Tahoma", Font.PLAIN, 10));
         lblErrorNgaySinh.setBounds(1001, 96, 162, 20);
+        lblErrorNgaySinh.setVisible(false);
         panel.add(lblErrorNgaySinh);
         
         lblErrorDiaChi = new JLabel("Không được để trống vùng dữ liệu địa chỉ nào");
         lblErrorDiaChi.setForeground(Color.RED);
         lblErrorDiaChi.setFont(new Font("Tahoma", Font.PLAIN, 10));
         lblErrorDiaChi.setBounds(303, 129, 368, 20);
+        lblErrorDiaChi.setVisible(false);
         panel.add(lblErrorDiaChi);
         
         lblErrorQuocTich = new JLabel("Quốc tịch không được để trống");
         lblErrorQuocTich.setForeground(Color.RED);
         lblErrorQuocTich.setFont(new Font("Tahoma", Font.PLAIN, 10));
         lblErrorQuocTich.setBounds(1042, 189, 162, 20);
+        lblErrorQuocTich.setVisible(false);
         panel.add(lblErrorQuocTich);
         
         JPanel pnTable = new JPanel();
@@ -411,16 +509,34 @@ public class PhieuDatPhong extends JPanel {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(6, 66, 1219, 230);
         pnTable.add(scrollPane);
-        
+
         table = new JTable();
-        table.setModel(new DefaultTableModel(
-        	new Object[][] {
-        	},
-        	new String[] {
-        		"STT","Mã phòng","Tình trạng","Loại hình thuê","Ngày thuê","Ngày trả","Ngày Checkout","Giá phòng","Xóa"
-        	}
-        ));
+        DefaultTableModel model = new DefaultTableModel(
+                new Object[][] {},
+                new String[] {"STT", "Mã phòng", "Tên phòng", "Tình trạng", "Loại hình thuê", "Ngày thuê", "Ngày trả", "Ngày Checkout", "Giá phòng", "Xóa"}) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Ensure all cells are not editable
+            }
+        };
+        table.setModel(model);
+
+        // Set background color, font, and alignment for column names
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(new Color(30, 144, 255)); // Change to the desired color
+        header.setForeground(Color.WHITE);
+        header.setFont(header.getFont().deriveFont(Font.BOLD).deriveFont(Font.BOLD, Font.PLAIN)); // Use the desired font style
+        ((DefaultTableCellRenderer) header.getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Set font and alignment for table data
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        table.setDefaultRenderer(Object.class, centerRenderer);
+
         scrollPane.setViewportView(table);
+
+
+
         
         JLabel lblNewLabel_4 = new JLabel("Danh sách phòng đang xử lý");
         lblNewLabel_4.setForeground(new Color(0, 108, 217));
@@ -429,8 +545,9 @@ public class PhieuDatPhong extends JPanel {
         pnTable.add(lblNewLabel_4);
         
         JButton btnThemPhong = new JButton("Thêm Phòng");
-        btnThemPhong.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
+        btnThemPhong.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
         		btnAddRoom_Clicked();
         	}
         });
@@ -472,10 +589,10 @@ public class PhieuDatPhong extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Update real-time labels
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                txtNgayLapPhieu.setText(getFormattedDate(dateFormat));
+                txtNgayLapPhieu.setText(new Date().toString());
             }
         });
+        timerRealTime.start();
         txtTenNV.setText(HomeForm.nhanVien.getTenNV());
         
         txtCMND.addKeyListener(new KeyAdapter() {
@@ -516,6 +633,9 @@ public class PhieuDatPhong extends JPanel {
                 return c;
             }
         });
+        
+        resetFieldBackgroundColors(Color.LIGHT_GRAY);
+        hienThiDanhSachPhongThue();
 	}
 	
 	private void txtCMND_TextChanged() {
@@ -621,6 +741,10 @@ public class PhieuDatPhong extends JPanel {
 	    txtHoTenKH.setEnabled(enabled);
 	    txtSDT.setEnabled(enabled);
 	    dateNgaySinh.setEnabled(enabled);
+	    if(enabled)
+	    	dateNgaySinh.setDateFormatString("dd/MM/yyyy");
+	    else
+	    	dateNgaySinh.setDateFormatString(" ");
 	    rbtnNam.setEnabled(enabled);
 	    rbtnNu.setEnabled(enabled);
 	    txtDuong.setEnabled(enabled);
@@ -659,32 +783,56 @@ public class PhieuDatPhong extends JPanel {
 
 	public void hienThiDanhSachPhongThue() {
 	    DefaultTableModel model = (DefaultTableModel) table.getModel();
-	    model.setRowCount(0); // Xóa các hàng hiện tại trong model
-	    int stt = 0;
+	    model.setRowCount(0); // Clear current rows in the model
+	    int stt = 1;
 	    int total = 0;
-	    
-	    // Lặp qua các hàng của DefaultTableModel
-	    for (int i = 0; i < model.getRowCount(); i++) {
+	    for (int i = 0; i < data.getRowCount(); i++) {
 	        try {
-	            Object[] rowData = model.getDataVector().get(i).toArray();
-	            stt++;
-	            String gia = (String) rowData[7];
-	            if (!gia.equals("Chưa tính")) {
-	                total += Integer.parseInt(gia);
-	            }
-	            rowData[0] = stt; // Cập nhật STT
-	            model.setValueAt(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(rowData[5]), i, 5); // Cập nhật ngày thuê
-	            model.setValueAt(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(rowData[6]), i, 6); // Cập nhật ngày trả
-	            model.setValueAt(String.format("%,d VNĐ", total), i, 7); // Cập nhật giá
+	            // Parse and format date/time strings
+	            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	            String checkInDateStr = dateFormat.format(data.getValueAt(i, 4));
+	            String checkOutDateStr = data.getValueAt(i, 5).toString();
+
+	            // Add row to the table model
+	            model.addRow(new Object[]{
+	                    stt++,
+	                    data.getValueAt(i, 0),
+	                    data.getValueAt(i, 1),
+	                    data.getValueAt(i, 2),
+	                    data.getValueAt(i, 3),
+	                    checkInDateStr,
+	                    checkOutDateStr,
+	                    data.getValueAt(i, 6),
+	                    Integer.parseInt(data.getValueAt(i, 7).toString())
+	            });
 	        } catch (Exception e) {
-	            e.printStackTrace();
+	            // If an exception occurs, add the row with default values
+	            model.addRow(new Object[]{
+	                    stt,
+	                    data.getValueAt(i, 0),
+	                    data.getValueAt(i, 1),
+	                    data.getValueAt(i, 2),
+	                    data.getValueAt(i, 3),
+	                    data.getValueAt(i, 4),
+	                    data.getValueAt(i, 5),
+	                    data.getValueAt(i, 6),
+	                    "Chưa tính"
+	            });
 	        }
 	    }
-	    lblTongTien.setText(String.format("%,d VNĐ", total)); // Cập nhật tổng tiền
-	    table.clearSelection(); // Bỏ chọn các hàng trong bảng
+	    // Calculate total
+	    for (int i = 0; i < data.getRowCount(); i++) {
+	        if (!data.getValueAt(i, 3).toString().toUpperCase().equals("KHÁC")) {
+	            total += Integer.parseInt(data.getValueAt(i, 7).toString());
+	        }
+	    }
+	    // Set total text
+	    lblTongTien.setText(String.format("%,d VNĐ", total));
+	    table.clearSelection(); // Deselect rows in the table
 	}
+
 	
-	private void txtDuong_TextChanged(java.awt.event.ActionEvent evt) {
+	private void txtDuong_TextChanged() {
 	    if (txtDuong.getText().trim().isEmpty()
 	            && txtPhuong.getText().trim().isEmpty()
 	            && txtQuan.getText().trim().isEmpty()
@@ -723,7 +871,7 @@ public class PhieuDatPhong extends JPanel {
 	    return phone.length() == 10 && phone.chars().allMatch(Character::isDigit);
 	}
 
-	private void txtSDT_TextChanged(java.awt.event.ActionEvent evt) {
+	private void txtSDT_TextChanged() {
 	    String textSDT = txtSDT.getText();
 	    boolean valid = isValidPhone(textSDT);
 	    if (valid) {

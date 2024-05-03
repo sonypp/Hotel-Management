@@ -50,8 +50,10 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class TaoPhieuDatPhong extends JPanel {
+public class BookingNew extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
@@ -76,7 +78,7 @@ public class TaoPhieuDatPhong extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public TaoPhieuDatPhong() {
+	public BookingNew() {
 		setBounds(0, 0, 1251, 835);
 		setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -200,9 +202,10 @@ public class TaoPhieuDatPhong extends JPanel {
         panel.add(rdbtnKhac);
         
         JButton btnTimKiem = new JButton("Tìm kiếm");
-        btnTimKiem.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		search(e);
+        btnTimKiem.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		search();
         	}
         });
         btnTimKiem.setBackground(new Color(0, 128, 255));
@@ -211,8 +214,9 @@ public class TaoPhieuDatPhong extends JPanel {
         panel.add(btnTimKiem);
         
         JButton btnLamMoi = new JButton("Làm mới");
-        btnLamMoi.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
+        btnLamMoi.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
         		cbbCTLP.setSelectedIndex(0);
         		cbbGiaPhong.setSelectedIndex(0);
         		cbbHienTrang.setSelectedIndex(0);
@@ -321,7 +325,7 @@ public class TaoPhieuDatPhong extends JPanel {
 
 	}
 	
-	private void search(ActionEvent e)
+	private void search()
 	{
 		if(checkBooking)
 		{

@@ -265,8 +265,38 @@ public class HoaDonBUS {
         }
 	}
 	
-	public static void main(String[] args) {
-	   
+	public ResultSet getHoaDon(String maHD)
+	{
+	    String query = "SELECT HoaDon.maHD, HoaDon.maCTT, NhanVien.tenNV, HoaDon.ngayThanhToan\r\n"
+	    		+ "FROM HoaDon\r\n"
+	    		+ "JOIN NhanVien ON HoaDon.maNV = NhanVien.maNV\r\n"
+	    		+ "JOIN ChiTietThue ON HoaDon.maCTT = ChiTietThue.maCTT\r\n"
+	    		+ "WHERE HoaDon.maHD = '\"" + maHD + "\'\r\n"
+	    		+ "";
+	    return db.getList(query);
+	}
+	
+	public ResultSet getThuePhong(String maHD)
+	{
+		String query = "select tenP, loaiHinhThue, ngayThue, ngayCheckOut, giaThue from CHITIETTHUEPHONG, PHONG, HOADON \r\nwhere CHITIETTHUEPHONG.maCTT = HOADON.maCTT and CHITIETTHUEPHONG.maP = Phong.maP and maHD = '" + maHD + "'";
+	    return db.getList(query);
+	}
+	public ResultSet getDichVu(String maHD)
+	{
+		String query = "select tenDV, loaiDV, ngaySuDung, SoLuong, ChiTietThueDichVu.giaDV, (SoLuong*ChiTietThueDichVu.giaDV) as Tong from CHITIETTHUEDICHVU, DICHVU, HOADON \r\nwhere CHITIETTHUEDICHVU.maCTT = HOADON.maCTT and CHITIETTHUEDICHVU.maDV = DICHVU.maDV and maHD = '" + maHD + "'";
+	    return db.getList(query);
+	}
+	
+	public void ThemHoaDon(String maHD, String maCTT, String giamGia, String phuThu, String ngayThanhToan, String pttt)
+	{
+	    String query = String.format("insert into HOADON values('{0}','{1}',{2},{3},'{4}',{5},0)", maHD, maCTT, giamGia, phuThu, ngayThanhToan, pttt);
+	    db.executeNonQuery(query);
+	}
+	
+	public int SoLuongHD(String dateNow)
+	{
+	    String query = "select COUNT(MaHD) + 1 from HOADON where cast(ngayThanhToan as date) = '" + dateNow + "'";
+	    return db.executeNonQueryGetInteger(query);
 	}
 
 }

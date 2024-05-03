@@ -14,10 +14,15 @@ import java.awt.Toolkit;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import java.awt.Color;
 import javax.swing.ImageIcon;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
+
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
 import BUS.ChucNangBUS;
 import BUS.NhanVienBUS;
@@ -47,16 +52,19 @@ public class FormDangNhap extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					FormDangNhap frame = new FormDangNhap();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace(); 
-				}
-			}
-		});
+	    try {
+	        UIManager.setLookAndFeel(new FlatMacLightLaf());
+	    } catch (UnsupportedLookAndFeelException e) {
+	        e.printStackTrace();
+	    }
+	    EventQueue.invokeLater(() -> {
+	        try {
+	        	FormDangNhap frame = new FormDangNhap();
+	            frame.setVisible(true);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    });
 	}
 
 	/**
@@ -228,12 +236,6 @@ public class FormDangNhap extends JFrame {
 		txtPW.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		txtPW.setBounds(825, 154, 221, 33);
 		contentPane.add(txtPW);
-	}
-	public void HienThiChucNang() {
-		String username = txtusername.getText();
-		var a = cnBUS.PhanQuyenQuanLy(username);
-		System.out.print(a);
-		
 	}
 	
 }

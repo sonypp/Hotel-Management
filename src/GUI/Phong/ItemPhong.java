@@ -3,8 +3,8 @@ package GUI.Phong;
 import javax.swing.*;
 
 import DTO.PhongDTO;
-import GUI.QuanLyDatPhong.PhieuDatPhong;
-import GUI.QuanLyDatPhong.TaoPhieuDatPhong;
+import GUI.QuanLyDatPhong.FormBookingNew;
+import GUI.QuanLyDatPhong.BookingNew;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -286,10 +286,10 @@ public class ItemPhong extends JPanel {
     }
 
     private void handleBooking() {
-    	TaoPhieuDatPhong parent = (TaoPhieuDatPhong)getTaoPhieDatPhongForm(this);
+    	BookingNew parent = (BookingNew)getTaoPhieDatPhongForm(this);
     	if(parent.isValid)
     	{
-	    	var phieuDatPhong = new PhieuDatPhong();
+	    	var phieuDatPhong = new FormBookingNew();
 	    	var popupFrame = new JFrame("Đặt phòng");
 	        popupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			popupFrame.setSize(1260, 900);
@@ -371,7 +371,7 @@ public class ItemPhong extends JPanel {
     
     private Component getTaoPhieDatPhongForm(Component x)
     {
-    	if(x instanceof TaoPhieuDatPhong)
+    	if(x instanceof BookingNew)
     		return x;
     	return getTaoPhieDatPhongForm(x.getParent());
     }

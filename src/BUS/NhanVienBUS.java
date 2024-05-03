@@ -20,15 +20,21 @@ public class NhanVienBUS {
         return db.getListNV_DTO(query);
     }
     public List<DSNhanVienDTO> getAllDSNV() {
-        String query = "SELECT NHANVIEN.maNV, NHANVIEN.tenNV, NHANVIEN.chucVu, TAIKHOAN.taiKhoan, " +
-                "CASE WHEN TAIKHOAN.tinhTrang IS NULL THEN -1 ELSE TAIKHOAN.tinhTrang END AS tinhTrang " +
-                "FROM NHANVIEN LEFT JOIN TAIKHOAN ON NHANVIEN.maNV = TAIKHOAN.maNV WHERE TAIKHOAN.xuLy = 0";
+        String query = "SELECT maNV, tenNV, chucVu, taiKhoan, tinhTrang\r\n"
+        		+ "FROM (\r\n"
+        		+ "	SELECT NHANVIEN.maNV, NHANVIEN.tenNV, NHANVIEN.chucVu,\r\n"
+        		+ "	CASE WHEN TAIKHOAN.taiKhoan IS NULL THEN 'Chưa có tài khoản' ELSE TAIKHOAN.taiKhoan END AS taiKhoan,\r\n"
+        		+ "	CASE WHEN TAIKHOAN.tinhTrang IS NULL THEN -1 ELSE TAIKHOAN.tinhTrang END AS tinhTrang,\r\n"
+        		+ "	CASE WHEN TAIKHOAN.xuLy IS NULL THEN 0 ELSE TAIKHOAN.xuLy END AS xuly\r\n"
+        		+ "	FROM NHANVIEN LEFT JOIN TAIKHOAN ON NHANVIEN.maNV = TAIKHOAN.maNV\r\n"
+        		+ ") AS tmp\r\n"
+        		+ "WHERE xuLy = 0";
         return db.getListDSNV_DTO(query);
     }
     
     public NhanVienDTO getNVDTO(String maNV)
     {
-    	String query = "SELECT * FROM NHANVIEN WHERE maNV = " + maNV;
+    	String query = "SELECT * FROM NHANVIEN WHERE maNV = '" + maNV + "'";
     	return db.getListNV_DTO(query).get(0);
     }
 
