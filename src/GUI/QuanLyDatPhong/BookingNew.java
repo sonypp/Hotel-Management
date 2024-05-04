@@ -223,9 +223,6 @@ public class BookingNew extends JPanel {
         		cbbLoaiPhong.setSelectedIndex(0);
         		cbbTTPhong.setSelectedIndex(0);
         		checkBooking = false;
-        		rdbtnTheoNgay.setSelected(false);
-        		rdbtnTheoGio.setSelected(false);
-        		rdbtnKhac.setSelected(false);
         		dateNgayThue.setDateFormatString("dd/MM/yyyy HH:mm:ss");
         		dateNgayTra.setDateFormatString("dd/MM/yyyy HH:mm:ss");
         		dateNgayTra.setEnabled(true);
@@ -235,6 +232,9 @@ public class BookingNew extends JPanel {
 		            AbstractButton button = elements.nextElement();
 		            button.setEnabled(true);
 		        }
+		        rdbtnTheoNgay.setSelected(false);
+		        rdbtnTheoGio.setSelected(false);
+		        rdbtnKhac.setSelected(false);
         		isValid = false;
         		setListPhong(phongBUS.getListPhong_DTO());
         	}
@@ -356,17 +356,19 @@ public class BookingNew extends JPanel {
 						List<PhongDTO> cttFiltered = new ArrayList<>();
 				        for (ChiTietThuePhongDTO cttp : cttList) {
 				            for (ChiTietThueDTO ctt : ctThueList) {
-				                if (cttp.getMaCTT().equals(ctt.getMaCTT())
-				                    && cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
-				                    && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)) {
-				                    cttFiltered.add(phongList.stream()
-				                            .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0
-				                                && !cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
-				                            .findFirst().orElse(null));
+				                if (cttp.getMaCTT().equals(ctt.getMaCTT())) {
+				                	if(cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0) {
+//				                		System.out.println("Ngay tra ctt: " + cttp.getNgayTra().getHours());
+//				                		System.out.println("Ngay thue tim kiem: " + dateNgayThue.getDate().toString());
+					                    if (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null) {
+						                    cttFiltered.add(phongList.stream()
+						                            .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0)
+						                            .findFirst().orElse(null));
+					                    }
+				                    }
 				                }
 				            }
 				        }
-						
 						List<PhongDTO> roomsValid = phongList.stream()
 						        .filter(room -> room.getTinhTrang() == 0)
 						        .filter(room -> cttFiltered.stream().noneMatch(ctt -> ctt.getMaP().equals(room.getMaP())))
@@ -434,11 +436,10 @@ public class BookingNew extends JPanel {
 					        for (ChiTietThuePhongDTO cttp : cttList) {
 					            for (ChiTietThueDTO ctt : ctThueList) {
 					                if (cttp.getMaCTT().equals(ctt.getMaCTT())
-					                    && cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
-					                    && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)) {
+					                    && (cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
+					                    && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null))) {
 					                    cttFiltered.add(phongList.stream()
-					                            .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0
-					                                && !cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
+					                            .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0)
 					                            .findFirst().orElse(null));
 					                }
 					            }
@@ -513,8 +514,8 @@ public class BookingNew extends JPanel {
 				                ChiTietThueDTO ctt = (ChiTietThueDTO) arr[1];
 				                PhongDTO room = (PhongDTO) arr[2];
 				                return ctt.getTinhTrangXuLy() == 0 &&
-				                        ((cttp.getNgayThue().compareTo(dateNgayThue.getDate()) <= 0 &&
-				                                (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null))
+				                        (((cttp.getNgayThue().compareTo(dateNgayThue.getDate()) <= 0 &&
+				                                (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)))
 				                                || cttp.getNgayThue().compareTo(dateNgayThue.getDate()) >= 0);
 				            })
 				            .map(arr -> (PhongDTO) arr[2]) // Map to PhongDTO

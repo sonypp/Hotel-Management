@@ -128,6 +128,36 @@ public class HomeForm extends JFrame {
 		panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
 		panelMenu.add(Box.createVerticalStrut(10));
 		
+		JLabel lblHinhAnh = new JLabel("");
+		lblHinhAnh.setBounds(10, 10, 1283, 329);
+		panelChinh.add(lblHinhAnh);
+		
+		JPanel panelLich = new JPanel();
+		
+		JPanel panelMaps = new JPanel();
+		panelMaps.setBounds(283, 348, 1017, 413);
+		panelChinh.add(panelMaps);
+		
+		JLabel lblHa1 = new JLabel("New label");
+		lblHa1.setBounds(10, 10, 275, 329);
+		lblHa1.setIcon(new ImageIcon(urlHa1));
+		panelChinh.add(lblHa1);
+		
+		JLabel lblHa2 = new JLabel("New label");
+		lblHa2.setBounds(283, 10, 304, 328);
+		lblHa2.setIcon(new ImageIcon(urlHa2));
+		panelChinh.add(lblHa2);
+		
+		JLabel lblHa3 = new JLabel("New label");
+		lblHa3.setBounds(593, 10, 304, 328);
+		lblHa3.setIcon(new ImageIcon(urlHa3));
+		panelChinh.add(lblHa3);
+		
+		JLabel lblHa4 = new JLabel("New label");
+		lblHa4.setBounds(907, 10, 393, 328);
+		lblHa4.setIcon(new ImageIcon(urlHa4));
+		panelChinh.add(lblHa4);
+		
 		
 
 		
@@ -148,9 +178,16 @@ public class HomeForm extends JFrame {
 					RefreshButton();
 					btnManHinhChinh.setBackground(Color.GRAY);
 				  	panelChinh.removeAll(); // Xóa các thành phần cũ trong panelChinh
+				  	panelChinh.add(lblHinhAnh); // Thêm lblHinhAnh vào panelChinh
+				  	panelChinh.add(lblHa1);
+				  	panelChinh.add(lblHa2);
+				  	panelChinh.add(lblHa3);
+				  	panelChinh.add(lblHa4);
+			        panelChinh.add(panelLich); // Thêm lblLich vào panelChinh
+			        panelChinh.add(panelMaps);
+			        panelChinh.revalidate(); // Cập nhật lại panelChinh
+			        panelChinh.repaint(); // Vẽ lại panelChinh
 				  	
-				  	panelChinh.revalidate(); // Cập nhật lại panelChinh
-				  	panelChinh.repaint(); // Vẽ lại panelChinh
 			}
 		});
 		btnManHinhChinh.addMouseListener(new MouseAdapter() {
@@ -302,7 +339,7 @@ public class HomeForm extends JFrame {
 		contentPane.add(panelChinh);
 		panelChinh.setLayout(null);
 		
-		JPanel panelLich = new JPanel();
+		
 		panelLich.setBounds(10, 316, 263, 445);
 		panelChinh.add(panelLich);
 		
@@ -312,33 +349,6 @@ public class HomeForm extends JFrame {
 
 		panelLich.add(calendar, BorderLayout.CENTER);
 		
-		JPanel panelMaps = new JPanel();
-		panelMaps.setBounds(283, 315, 1017, 446);
-		panelChinh.add(panelMaps);
-		
-		JLabel lblHinhAnh = new JLabel("");
-		lblHinhAnh.setBounds(10, 10, 1283, 295);
-		panelChinh.add(lblHinhAnh);
-		
-		JLabel lblHa1 = new JLabel("New label");
-		lblHa1.setBounds(10, 10, 275, 295);
-		lblHa1.setIcon(new ImageIcon(urlHa1));
-		panelChinh.add(lblHa1);
-		
-		JLabel lblHa2 = new JLabel("New label");
-		lblHa2.setBounds(283, 10, 304, 295);
-		lblHa2.setIcon(new ImageIcon(urlHa2));
-		panelChinh.add(lblHa2);
-		
-		JLabel lblHa3 = new JLabel("New label");
-		lblHa3.setBounds(593, 10, 304, 295);
-		lblHa3.setIcon(new ImageIcon(urlHa3));
-		panelChinh.add(lblHa3);
-		
-		JLabel lblHa4 = new JLabel("New label");
-		lblHa4.setBounds(907, 10, 393, 295);
-		lblHa4.setIcon(new ImageIcon(urlHa4));
-		panelChinh.add(lblHa4);
 		lblXinChao = new JLabel("Xin chào ");
 		lblXinChao.setBackground(new Color(240, 240, 240));
 		lblXinChao.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));

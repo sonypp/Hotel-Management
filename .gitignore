@@ -12,6 +12,7 @@ gradle-app.setting
 *.war
 *.ear
 *.class
+*.pdf
 
 # eclipse specific git ignore
 *.pydevproject

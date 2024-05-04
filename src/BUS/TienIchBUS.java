@@ -5,7 +5,7 @@ import DTO.TienIchDTO;
 
 import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;

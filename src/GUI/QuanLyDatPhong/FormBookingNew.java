@@ -11,11 +11,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -510,30 +513,41 @@ public class FormBookingNew extends JPanel {
         scrollPane.setBounds(6, 66, 1219, 230);
         pnTable.add(scrollPane);
 
-        table = new JTable();
-        DefaultTableModel model = new DefaultTableModel(
-                new Object[][] {},
-                new String[] {"STT", "Mã phòng", "Tên phòng", "Tình trạng", "Loại hình thuê", "Ngày thuê", "Ngày trả", "Ngày Checkout", "Giá phòng", "Xóa"}) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Ensure all cells are not editable
-            }
-        };
-        table.setModel(model);
+        String column[] = {"STT", "Mã phòng", "Tên phòng", "Tình trạng", "Loại hình thuê", "Ngày thuê", "Ngày trả", "Ngày Checkout", "Giá phòng", "Xóa"};
 
-        // Set background color, font, and alignment for column names
-        JTableHeader header = table.getTableHeader();
-        header.setBackground(new Color(30, 144, 255)); // Change to the desired color
-        header.setForeground(Color.WHITE);
-        header.setFont(header.getFont().deriveFont(Font.BOLD).deriveFont(Font.BOLD, Font.PLAIN)); // Use the desired font style
-        ((DefaultTableCellRenderer) header.getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        var model = new DefaultTableModel(new Object[][] {}, column);
 
-        // Set font and alignment for table data
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        table.setDefaultRenderer(Object.class, centerRenderer);
+        table = new JTable(model);
+        int[] columnWidths = {30, 120, 120, 180, 120, 150, 100, 100, 100, 100};
 
+        for (int i = 0; i < columnWidths.length; i++) {
+            table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+        }
+
+        table.setRowHeight(30);
         scrollPane.setViewportView(table);
+
+        // Customize the table header
+        JTableHeader tableHeader = table.getTableHeader();
+        tableHeader.setBackground(new Color(30, 144, 255)); // Change to the desired color
+        tableHeader.setForeground(Color.WHITE);
+        tableHeader.setReorderingAllowed(false);
+
+        // Set font style and alignment for column headers
+        Font headerFont = new Font("Arial", Font.BOLD, 14);
+        tableHeader.setFont(headerFont);
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        headerRenderer.setVerticalAlignment(SwingConstants.CENTER);
+        headerRenderer.setText("<html><font color='white'>" + Arrays.toString(column).replaceAll("\\[|\\]", "") + "</font></html>");
+
+        // Customize other properties of the table
+        table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        table.setShowGrid(false);
+
+        // Make the table content not editable
+        table.setDefaultEditor(Object.class, null);
+
 
 
 
@@ -560,7 +574,7 @@ public class FormBookingNew extends JPanel {
         btnLuuPhieuThue.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		
+        		buttonRounded2_Click();
         	}
         });
         btnLuuPhieuThue.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -621,18 +635,6 @@ public class FormBookingNew extends JPanel {
                 }
             }
         });
-        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
-            @Override
-            public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                final java.awt.Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (row % 2 == 0) {
-                    c.setBackground(new Color(249, 249, 249));
-                } else {
-                    c.setBackground(Color.WHITE);
-                }
-                return c;
-            }
-        });
         
         resetFieldBackgroundColors(Color.LIGHT_GRAY);
         hienThiDanhSachPhongThue();
@@ -669,27 +671,33 @@ public class FormBookingNew extends JPanel {
 	        if (!khachhangs.isEmpty()) {
 	            FrmSearchCustomer frmSearch = new FrmSearchCustomer(khachhangs);
 	            frmSearch.setVisible(true);
-	            if (frmSearch.DialogResult == JOptionPane.OK_OPTION) {
-	                KhachHangDTO selectedCustomer = frmSearch.khachHang;
-	                txtHoTenKH.setText(selectedCustomer.getTenKH());
-	                dateNgaySinh.setDate(selectedCustomer.getNgaySinh());
-	                if (selectedCustomer.getGioiTinh() == 0) {
-	                    rbtnNam.setSelected(true);
-	                } else {
-	                    rbtnNu.setSelected(true);
-	                }
-	                txtQuocTich.setText(selectedCustomer.getQuocTich());
-	                txtMaKH.setText(selectedCustomer.getMaKH());
-	                String[] queQuan = selectedCustomer.getQueQuan().split(",");
-	                txtSDT.setText(selectedCustomer.getSDT());
-	                txtDuong.setText(queQuan[0]);
-	                txtPhuong.setText(queQuan[1]);
-	                txtQuan.setText(queQuan[2]);
-	                txtTinhThanh.setText(queQuan[3]);
-
-	                resetFieldBackgroundColors(Color.LIGHT_GRAY);
-	                enableCustomerInfoFields(false);
-	            }
+	            new Timer(100, new ActionListener() {
+	        		@Override
+	        		public void actionPerformed(ActionEvent e) {
+			            if (frmSearch.DialogResult == JOptionPane.OK_OPTION) {
+			                KhachHangDTO selectedCustomer = frmSearch.khachHang;
+			                txtHoTenKH.setText(selectedCustomer.getTenKH());
+			                dateNgaySinh.setDate(selectedCustomer.getNgaySinh());
+			                if (selectedCustomer.getGioiTinh() == 0) {
+			                    rbtnNam.setSelected(true);
+			                } else {
+			                    rbtnNu.setSelected(true);
+			                }
+			                txtQuocTich.setText(selectedCustomer.getQuocTich());
+			                txtMaKH.setText(selectedCustomer.getMaKH());
+			                String[] queQuan = selectedCustomer.getQueQuan().split(",");
+			                txtSDT.setText(selectedCustomer.getSDT());
+			                txtDuong.setText(queQuan[0]);
+			                txtPhuong.setText(queQuan[1]);
+			                txtQuan.setText(queQuan[2]);
+			                txtTinhThanh.setText(queQuan[3]);
+		
+			                resetFieldBackgroundColors(Color.WHITE);
+			                enableCustomerInfoFields(false);
+			                frmSearch.dispose();
+			            }
+	        		}
+	            }).start();;
 	        }
 	    }
 	}
@@ -718,22 +726,30 @@ public class FormBookingNew extends JPanel {
 		popupFrame.setSize(1260, 900);
 		popupFrame.getContentPane().add(frmSelectRoom);
 		popupFrame.setLocationRelativeTo(null); // Hiển thị ở giữa màn hình
-    	if (frmSelectRoom.DialogResult == JOptionPane.OK_OPTION)
-    	{
-    	    PhongDTO phong = (PhongDTO)frmSelectRoom.arr[0];
-    	    try
-    	    {
-    	    	data.addRow(new Object[] {phong.getMaP(), phong.getTenP(), "Đang xử lý", frmSelectRoom.arr[1], Date.parse(frmSelectRoom.arr[2].toString()), Date.parse(frmSelectRoom.arr[3].toString()), "", Integer.parseInt(frmSelectRoom.arr[4].toString())});
-    	    	
-    	    }
-    	    catch (Exception e)
-    	    {
-    	    	data.addRow(new Object[] {phong.getMaP(), phong.getTenP(), "Đang xử lý", frmSelectRoom.arr[1], Date.parse(frmSelectRoom.arr[2].toString()), frmSelectRoom.arr[3].toString(), "", Integer.parseInt(frmSelectRoom.arr[4].toString())});
-    	    }
-    	    hienThiDanhSachPhongThue();
-    	}
     	popupFrame.setVisible(true);
     	frmSelectRoom.setVisible(true);
+    	var timer = new Timer(100, new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+				if (frmSelectRoom.DialogResult == JOptionPane.OK_OPTION)
+				{
+					PhongDTO phong = (PhongDTO)frmSelectRoom.arr[0];
+					try
+					{
+						data.addRow(new Object[] {phong.getMaP(), phong.getTenP(), "Đang xử lý", frmSelectRoom.arr[1], frmSelectRoom.arr[2].toString(), frmSelectRoom.arr[3].toString(), "", Integer.parseInt(frmSelectRoom.arr[4].toString())});
+						
+					}
+					catch (Exception ex)
+					{
+						data.addRow(new Object[] {phong.getMaP(), phong.getTenP(), "Đang xử lý", frmSelectRoom.arr[1], frmSelectRoom.arr[2].toString(), frmSelectRoom.arr[3].toString(), "", Integer.parseInt(frmSelectRoom.arr[4].toString())});
+					}
+					hienThiDanhSachPhongThue();
+					popupFrame.dispose();
+					((javax.swing.Timer) e.getSource()).stop();
+				}
+    		}
+    	});
+    	timer.start();
     }
 
 
@@ -742,9 +758,15 @@ public class FormBookingNew extends JPanel {
 	    txtSDT.setEnabled(enabled);
 	    dateNgaySinh.setEnabled(enabled);
 	    if(enabled)
+	    {
 	    	dateNgaySinh.setDateFormatString("dd/MM/yyyy");
+	    	dateNgaySinh.setDate(new Date());
+	    }
 	    else
+	    {
 	    	dateNgaySinh.setDateFormatString(" ");
+	    	dateNgaySinh.setDate(new Date());
+	    }
 	    rbtnNam.setEnabled(enabled);
 	    rbtnNu.setEnabled(enabled);
 	    txtDuong.setEnabled(enabled);
@@ -788,9 +810,9 @@ public class FormBookingNew extends JPanel {
 	    int total = 0;
 	    for (int i = 0; i < data.getRowCount(); i++) {
 	        try {
-	            // Parse and format date/time strings
-	            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-	            String checkInDateStr = dateFormat.format(data.getValueAt(i, 4));
+	        	Locale locale = new Locale("vi", "VN");
+	            NumberFormat vndFormat = NumberFormat.getCurrencyInstance(locale);
+	            String checkInDateStr = data.getValueAt(i, 4).toString();
 	            String checkOutDateStr = data.getValueAt(i, 5).toString();
 
 	            // Add row to the table model
@@ -803,9 +825,10 @@ public class FormBookingNew extends JPanel {
 	                    checkInDateStr,
 	                    checkOutDateStr,
 	                    data.getValueAt(i, 6),
-	                    Integer.parseInt(data.getValueAt(i, 7).toString())
+	                    vndFormat.format(Integer.parseInt(String.valueOf(data.getValueAt(i, 7))))
 	            });
 	        } catch (Exception e) {
+	        	e.printStackTrace();
 	            // If an exception occurs, add the row with default values
 	            model.addRow(new Object[]{
 	                    stt,
@@ -881,7 +904,7 @@ public class FormBookingNew extends JPanel {
 	    }
 	}
 	
-	private void buttonRounded2_Click(ActionEvent e) {
+	private void buttonRounded2_Click() {
 	    SimpleDateFormat formatter1 = new SimpleDateFormat("ddMMyy");
 	    SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
 	    SimpleDateFormat formatter3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -896,7 +919,7 @@ public class FormBookingNew extends JPanel {
 	            if (txtHoTenKH.getText().trim().length() == 0) {
 	                lblErrorTenKH.setVisible(true);
 	            }
-	            if (years(dateNgaySinh.getDate(), new Date()) >= 16) {
+	            if (years(dateNgaySinh.getDate() != null? dateNgaySinh.getDate() : new Date(), new Date()) >= 18) {
 	                lblErrorNgaySinh.setVisible(false);
 	            } else {
 	                lblErrorNgaySinh.setVisible(true);
@@ -943,16 +966,23 @@ public class FormBookingNew extends JPanel {
 	                    if (txtTienCoc.getText().trim().length() == 0) {
 	                        txtTienCoc.setText("0");
 	                    }
-	                    ctt.InsertCTT(txtMaCTT.getText().trim(), txtMaKH.getText().trim(), HomeForm.nhanVien.getMaNV(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), txtTienCoc.getText());
-
-	                    for (int i = 0; i < data.getRowCount(); i++) {
-	                        if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO NGÀY")) {
-	                            cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 5).toString().trim())), "0", data.getValueAt(i, 7).toString());
-	                        } else if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO GIỜ")) {
-	                            cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 5).toString().trim())), "1", data.getValueAt(i, 7).toString());
-	                        } else {
-	                            cttp.InsertCTTP(false, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), "2", data.getValueAt(i, 7).toString());
-	                        }
+	                    try {
+		                    var format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+		                	var format1 =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		                    ctt.InsertCTT(txtMaCTT.getText().trim(), txtMaKH.getText().trim(), HomeForm.nhanVien.getMaNV(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), txtTienCoc.getText());
+		                    
+		                    for (int i = 0; i < data.getRowCount(); i++) {
+		                        if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO NGÀY")) {
+										cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), format1.format(format.parse(data.getValueAt(i, 5).toString().trim())), "0", data.getValueAt(i, 7).toString());
+		                        } else if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO GIỜ")) {
+		                            cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), format1.format(format.parse(data.getValueAt(i, 5).toString().trim())), "1", data.getValueAt(i, 7).toString());
+		                        } else {
+		                            cttp.InsertCTTP(false, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), "2", data.getValueAt(i, 7).toString());
+		                        }
+		                    }
+	                    } catch (ParseException e) {
+	                    	// TODO Auto-generated catch block
+	                    	e.printStackTrace();
 	                    }
 	                    
 	                    JOptionPane.showMessageDialog(null, "Thêm phiếu thuê mới thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
@@ -1016,20 +1046,27 @@ public class FormBookingNew extends JPanel {
 	                if (txtTienCoc.getText().trim().length() == 0) {
 	                    txtTienCoc.setText("0");
 	                }
-	                ctt.InsertCTT(txtMaCTT.getText().trim(), txtMaKH.getText().trim(), HomeForm.nhanVien.getMaNV(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), txtTienCoc.getText());
-
-	                for (int i = 0; i < data.getRowCount(); i++) {
-	                    if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO NGÀY")) {
-	                        cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 5).toString().trim())), "0", data.getValueAt(i, 7).toString());
-	                    } else if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO GIỜ")) {
-	                        cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 5).toString().trim())), "1", data.getValueAt(i, 7).toString());
-	                    } else {
-	                        cttp.InsertCTTP(false, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(data.getValueAt(i, 4).toString().trim())), "2", data.getValueAt(i, 7).toString());
-	                    }
+	                try {
+	                	var format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+	                	var format1 =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		                ctt.InsertCTT(txtMaCTT.getText().trim(), txtMaKH.getText().trim(), HomeForm.nhanVien.getMaNV(), format1.format(new Date()), txtTienCoc.getText());
+	
+		                for (int i = 0; i < data.getRowCount(); i++) {
+		                    if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO NGÀY")) {
+									cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), format1.format(format.parse(data.getValueAt(i, 5).toString().trim())), "0", data.getValueAt(i, 7).toString());
+		                    } else if (data.getValueAt(i, 3).toString().toUpperCase().equals("THEO GIỜ")) {
+		                        cttp.InsertCTTP(true, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), format1.format(format.parse(data.getValueAt(i, 5).toString().trim())), "1", data.getValueAt(i, 7).toString());
+		                    } else {
+		                        cttp.InsertCTTP(false, txtMaCTT.getText().trim(), data.getValueAt(i, 0).toString().trim(), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), format1.format(format.parse(data.getValueAt(i, 4).toString().trim())), "2", data.getValueAt(i, 7).toString());
+		                    }
+		                }
+		                
+		                JOptionPane.showMessageDialog(null, "Thêm phiếu thuê mới thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+		                XuatFilePDF();
+	                } catch (ParseException e) {
+	                	// TODO Auto-generated catch block
+	                	e.printStackTrace();
 	                }
-	                
-	                JOptionPane.showMessageDialog(null, "Thêm phiếu thuê mới thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-	                XuatFilePDF();
 	            }
 	        }
 	    }
@@ -1141,6 +1178,12 @@ public class FormBookingNew extends JPanel {
 	        }
 	        document.add(table);
 	        document.close();
+	        File pdfFile = new File("CTT" + txtMaCTT.getText() + ".pdf");
+	        if (pdfFile.exists()) {
+	            Desktop.getDesktop().open(pdfFile);
+	        } else {
+	            System.out.println("PDF file not found: " + "CTT" + txtMaCTT.getText() + ".pdf");
+	        }
 	    } catch (DocumentException | IOException e) {
 	        e.printStackTrace();
 	    }

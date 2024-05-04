@@ -76,6 +76,7 @@ public class FrmSearchCustomer extends JFrame {
     }
 
     public void HienThiDSKhachHang(List<KhachHangDTO> list) {
+    	model = (DefaultTableModel) tbKH.getModel();
         model.setRowCount(0);
         int stt = 0;
         for (KhachHangDTO x : list) {
@@ -101,6 +102,5 @@ public class FrmSearchCustomer extends JFrame {
         khachHang = new KhachHangDTO();
         khachHang = list.get(tbKH.getSelectedRow());
         DialogResult = JOptionPane.OK_OPTION;
-        this.dispose();
     }
 }

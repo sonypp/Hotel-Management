@@ -15,7 +15,7 @@ import BUS.PhongBUS;
 import DTO.ChiTietThueDTO;
 import DTO.ChiTietThuePhongDTO;
 import DTO.PhongDTO;
-import GUI.Phong.ItemPhong;
+import GUI.Phong.ItemAddPhong;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -49,6 +49,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
@@ -68,7 +69,7 @@ public class FormSelectRoom extends JPanel {
 	private DefaultTableModel dt;
 	private Container rowPanel;
 	private FlowLayout rowLayout;
-	private Container pnPhong;
+	private JPanel pnPhong;
 	private JComboBox cbbGiaPhong;
 	public JRadioButton rdbtnTheoNgay;
 	public JRadioButton rdbtnTheoGio;
@@ -384,10 +385,14 @@ public class FormSelectRoom extends JPanel {
 	        }
 
 	        if (!check) {
-	            ItemPhong itemRoom = new ItemPhong(room);
-	            pnPhong.add(itemRoom);
+	            ItemAddPhong itemRoom = new ItemAddPhong(room);
+	            itemRoom.setPreferredSize(new Dimension(350, 300));
+	            itemRoom.setBackground(Color.GREEN);
+	            itemRoom.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+	            rowPanel.add(itemRoom);
 	            itemRoom.setVisible(true);
 	        } else {
+	            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 	            if (dt.getValueAt(index, 3).toString().toUpperCase().equals("THEO NGÀY")
 	                    || dt.getValueAt(index, 3).toString().toUpperCase().equals("THEO GIỜ")) {
 	                if (rdbtnTheoNgay.isSelected() || rdbtnTheoGio.isSelected()) {
@@ -395,12 +400,20 @@ public class FormSelectRoom extends JPanel {
 	                            dateNgayTra.getDate().getMonth(), dateNgayTra.getDate().getDay(),
 	                            dateNgayThue.getDate().getHours(), dateNgayThue.getDate().getMinutes(),
 	                            dateNgayThue.getDate().getSeconds());
-	                    if (dateNgayThue.getDate().getTime() >= Long.parseLong(dt.getValueAt(index, 5).toString())
-	                            || dateTra.getTime() <= Long.parseLong(dt.getValueAt(index, 4).toString())) {
-	                        ItemPhong itemRoom = new ItemPhong(room);
-	                        pnPhong.add(itemRoom);
-	                        itemRoom.setVisible(true);
-	                    }
+	                    try {
+							if (dateNgayThue.getDate().getTime() >= dateFormat.parse(dt.getValueAt(index, 5).toString()).getTime()
+							        || dateTra.getTime() <= dateFormat.parse(dt.getValueAt(index, 4).toString()).getTime()) {
+							    ItemAddPhong itemRoom = new ItemAddPhong(room);
+							    itemRoom.setPreferredSize(new Dimension(350, 300));
+							    itemRoom.setBackground(Color.GREEN);
+							    itemRoom.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+							    rowPanel.add(itemRoom);
+							    itemRoom.setVisible(true);
+							}
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	                }
 	            } else {
 	                if (rdbtnTheoNgay.isSelected() || rdbtnTheoGio.isSelected()) {
@@ -408,11 +421,19 @@ public class FormSelectRoom extends JPanel {
 	                            dateNgayTra.getDate().getMonth(), dateNgayTra.getDate().getDay(),
 	                            dateNgayThue.getDate().getHours(), dateNgayThue.getDate().getMinutes(),
 	                            dateNgayThue.getDate().getSeconds());
-	                    if (dateTra.getTime() <= Long.parseLong(dt.getValueAt(index, 4).toString())) {
-	                        ItemPhong itemRoom = new ItemPhong(room);
-	                        pnPhong.add(itemRoom);
-	                        itemRoom.setVisible(true);
-	                    }
+	                    try {
+							if (dateTra.getTime() <= dateFormat.parse(dt.getValueAt(index, 4).toString()).getTime()) {
+							    ItemAddPhong itemRoom = new ItemAddPhong(room);
+							    itemRoom.setPreferredSize(new Dimension(350, 300));
+							    itemRoom.setBackground(Color.GREEN);
+							    itemRoom.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+							    rowPanel.add(itemRoom);
+							    itemRoom.setVisible(true);
+							}
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 	                }
 	            }
 	        }

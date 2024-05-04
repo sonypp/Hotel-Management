@@ -8,7 +8,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -372,8 +372,9 @@ public class BookingList extends JPanel {
         String column[] = {"STT","MÃ CT THUÊ", "MÃ KHÁCH HÀNG", "TÊN KHÁCH HÀNG", "MÃ NHÂN VIÊN", "NHÂN VIÊN LẬP PHIẾU", "NGÀY LẬP PHIẾU", "TIỀN ĐẶT CỌC", "TÌNH TRẠNG"};
         String data[][] = {};
         
+        tbRoomModel = new DefaultTableModel(data, column);
         
-        tbRoom = new JTable(data, column);
+        tbRoom = new JTable(tbRoomModel);
         int[] columnWidths = {30, 120, 120, 180, 120, 150, 100, 100, 100}; 
         int columnIndex = 0;
         for (int width : columnWidths) {
@@ -381,7 +382,6 @@ public class BookingList extends JPanel {
             columnSize.setPreferredWidth(width);
         }
         tbRoom.setRowHeight(30);
-        tbRoomModel = (DefaultTableModel)tbRoom.getModel();
         
         // Customize the table header
         JTableHeader tableHeader = tbRoom.getTableHeader();

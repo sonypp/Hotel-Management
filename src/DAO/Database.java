@@ -1,6 +1,13 @@
 package DAO;
 
-import java.sql.*;
+import java.util.Date;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +88,7 @@ public class Database {
 				}
 				case "Date": {
 					/* Thêm vào câu query sao cho sql hiểu là dữ liệu kiểu Date */
-					pstmt.setDate(i, (Date) obj);
+					pstmt.setTimestamp(i, new Timestamp(((Date) obj).getTime()));
 					break;
 				}
 				}
@@ -116,7 +123,7 @@ public class Database {
 					break;
 				}
 				case "Date": {
-					pstmt.setDate(i, (Date) obj);
+					pstmt.setTimestamp(i, new Timestamp(((Date) obj).getTime()));
 					break;
 				}
 				}
@@ -207,7 +214,7 @@ public class Database {
 		List<NhanVienDTO> list = new ArrayList<>();
 		while (rs.next()) {
 			NhanVienDTO nv = new NhanVienDTO(rs.getString(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getInt(5),
-					rs.getDate(6), rs.getDate(7), rs.getString(8), rs.getInt(9), rs.getInt(10));
+					rs.getTimestamp(6), rs.getTimestamp(7), rs.getString(8), rs.getInt(9), rs.getInt(10));
 			list.add(nv);
 		}
 		return list;
@@ -279,7 +286,7 @@ public class Database {
 		List<KhachHangDTO> list = new ArrayList<>();
 		while (rs.next()) {
 			KhachHangDTO kh = new KhachHangDTO(rs.getString(1), rs.getString(2), rs.getString(3), rs.getInt(4),
-					rs.getString(5), rs.getString(6), rs.getString(7), rs.getDate(8), rs.getInt(9));
+					rs.getString(5), rs.getString(6), rs.getString(7), rs.getTimestamp(8), rs.getInt(9));
 			list.add(kh);
 		}
 		return list;
@@ -345,7 +352,7 @@ public class Database {
 	public List<ChiTietThueDichVuDTO> toListCTTDV_DTO(ResultSet rs) throws SQLException {
 		List<ChiTietThueDichVuDTO> list = new ArrayList<>();
 		while (rs.next()) {
-			ChiTietThueDichVuDTO dv = new ChiTietThueDichVuDTO(rs.getString(1), rs.getString(2), rs.getDate(3),
+			ChiTietThueDichVuDTO dv = new ChiTietThueDichVuDTO(rs.getString(1), rs.getString(2), rs.getTimestamp(3),
 					rs.getInt(4), rs.getInt(5));
 			list.add(dv);
 		}
@@ -379,8 +386,8 @@ public class Database {
 	public List<ChiTietThuePhongDTO> toListCTTP_DTO(ResultSet rs) throws SQLException {
 		List<ChiTietThuePhongDTO> list = new ArrayList<>();
 		while (rs.next()) {
-			ChiTietThuePhongDTO cttp = new ChiTietThuePhongDTO(rs.getString(1), rs.getString(2), rs.getDate(3),
-					rs.getDate(4), rs.getDate(5), rs.getInt(6), rs.getInt(7), rs.getInt(8));
+			ChiTietThuePhongDTO cttp = new ChiTietThuePhongDTO(rs.getString(1), rs.getString(2), rs.getTimestamp(3),
+					rs.getTimestamp(4), rs.getTimestamp(5), rs.getInt(6), rs.getInt(7), rs.getInt(8));
 			list.add(cttp);
 		}
 		return list;
@@ -452,7 +459,7 @@ public class Database {
 	public List<ChiTietThueDTO> toListCTT_DTO(ResultSet rs) throws SQLException {
 		List<ChiTietThueDTO> list = new ArrayList<>();
 		while (rs.next()) {
-			ChiTietThueDTO ctt = new ChiTietThueDTO(rs.getString(1), rs.getString(2), rs.getString(3), rs.getDate(4),
+			ChiTietThueDTO ctt = new ChiTietThueDTO(rs.getString(1), rs.getString(2), rs.getString(3), rs.getTimestamp(4),
 					rs.getInt(5), rs.getInt(6), rs.getInt(7));
 			list.add(ctt);
 		}
@@ -529,7 +536,7 @@ public class Database {
 		ChiTietThueDTO ctt = null;
 		try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 			if (rs.next()) {
-				ctt = new ChiTietThueDTO(rs.getString(1), rs.getString(2), rs.getString(3), rs.getDate(4), rs.getInt(5),
+				ctt = new ChiTietThueDTO(rs.getString(1), rs.getString(2), rs.getString(3), rs.getTimestamp(4), rs.getInt(5),
 						rs.getInt(6), rs.getInt(7));
 			}
 		} catch (SQLException e) {

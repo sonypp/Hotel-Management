@@ -1,7 +1,7 @@
 package BUS;
 
 import java.util.List;
-import java.sql.Date;
+import java.util.Date;
 import DAO.Database;
 import DTO.ChiTietThueDTO;
 import DTO.PhongDTO;
@@ -24,7 +24,7 @@ public class ChiTietThueBUS {
     }
 
     public void InsertCTT(String maCTT, String maKH, String maNV, String ngayLapPhieu, String tienDatCoc) {
-        String query = String.format("insert into CHITIETTHUE values('%s','%s','%s','%s',%d,0,0)", maCTT, maKH, maNV, ngayLapPhieu, tienDatCoc);
+        String query = String.format("insert into CHITIETTHUE values('%s','%s','%s','%s',%s,0,0)", maCTT, maKH, maNV, ngayLapPhieu, tienDatCoc);
         db.executeNonQuery(query);
     }
 
