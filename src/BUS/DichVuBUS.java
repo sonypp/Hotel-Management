@@ -147,6 +147,33 @@ public class DichVuBUS {
 	    return filteredList;
 	}
 	
-	public static void main(String[] args) {
+	public ResultSet getListDichVuCTPhieuThue(String key, String loaiDV) {
+	    String query;
+	    if (key.equals("Nhập Mã/Tên dịch vụ cần tìm")) {
+	        query = "select maDV,tenDV,loaiDV,giaDV from DichVu where XuLy = 0";
+	        if (loaiDV.trim().equals("Ăn uống")) {
+	            query += " AND loaiDV = N'Ăn uống'";
+	        } else if (loaiDV.trim().equals("Chăm sóc sắc đẹp")) {
+	            query += " AND loaiDV = N'Chăm sóc sắc đẹp'";
+	        } else if (loaiDV.trim().equals("Tổ chức tiệc")) {
+	            query += " AND loaiDV = N'Tổ chức tiệc'";
+	        } else if (loaiDV.trim().equals("Giải trí")) {
+	            query += " AND loaiDV = N'Giải trí'";
+	        }
+	    } else {
+	        query = "select maDV,tenDV,loaiDV,giaDV from DichVu where XuLy = 0 AND ( maDV LIKE N'%" + key + "%' or tendv LIKE N'%" + key + "%')";
+	        if (loaiDV.trim().equals("Ăn uống")) {
+	            query += " AND loaiDV = N'Ăn uống'";
+	        } else if (loaiDV.trim().equals("Chăm sóc sắc đẹp")) {
+	            query += " AND loaiDV = N'Chăm sóc sắc đẹp'";
+	        } else if (loaiDV.trim().equals("Tổ chức tiệc")) {
+	            query += " AND loaiDV = N'Tổ chức tiệc'";
+	        } else if (loaiDV.trim().equals("Giải trí")) {
+	            query += " AND loaiDV = N'Giải trí'";
+	        }
+	    }
+	    ResultSet rs = db.getList(query);
+	    return rs;
 	}
+
 }

@@ -27,6 +27,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import org.w3c.dom.events.EventTarget;
 
@@ -36,11 +38,15 @@ import DTO.DichVuDTO;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
+import java.awt.GridLayout;
+import java.awt.FlowLayout;
+import java.awt.Dimension;
 
 public class QLDVPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField tfMaDV, tfTenDV, tf_frmMaDV, tf_frmTenDV, tf_frmGiaDV;
+	public static int[] lengthColumn = {120,300,220,250};
 	private JTable tbDV;
 	private DichVuBUS dichVuBUS;
 	private JComboBox cbbGiaDV, cbb_frmLoaiDV;
@@ -52,6 +58,7 @@ public class QLDVPanel extends JPanel {
 	private JComboBox cbbLoaiDV;
 	private JButton btnTimkiem;
 	private JButton btnLamMoi;
+	private JPanel panel;
 
 	/**
 	 * Create the panel.
@@ -59,7 +66,7 @@ public class QLDVPanel extends JPanel {
 	public QLDVPanel() {
 		dichVuBUS = new DichVuBUS();
 		setBackground(new Color(245, 245, 245));
-		setBounds(0, 0, 1251, 835);
+		setBounds(0, 0, 1251, 735);
 		setLayout(null);
 		
 		JLabel lbQLDV = new JLabel("QUẢN LÍ DỊCH VỤ");
@@ -79,47 +86,12 @@ public class QLDVPanel extends JPanel {
 		add(pnTimKiem);
 		pnTimKiem.setLayout(null);
 		
-		JLabel lbMaDV = new JLabel("Mã dịch vụ:");
-		lbMaDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lbMaDV.setBounds(10, 10, 82, 39);
-		pnTimKiem.add(lbMaDV);
-		
-		tfMaDV = new JTextField();
-		tfMaDV.setBounds(102, 22, 168, 19);
-		pnTimKiem.add(tfMaDV);
-		tfMaDV.setColumns(10);
-		
-		JLabel lbTenDV = new JLabel("Tên dịch vụ:");
-		lbTenDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lbTenDV.setBounds(280, 10, 99, 39);
-		pnTimKiem.add(lbTenDV);
-		
-		tfTenDV = new JTextField();
-		tfTenDV.setColumns(10);
-		tfTenDV.setBounds(391, 22, 168, 19);
-		pnTimKiem.add(tfTenDV);
-		
-		JLabel lbLoaiDV = new JLabel("Loại dịch vụ:");
-		lbLoaiDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lbLoaiDV.setBounds(569, 10, 99, 39);
-		pnTimKiem.add(lbLoaiDV);
-		
 		DefaultComboBoxModel<String> model_loaiDichVu = new DefaultComboBoxModel();
 		model_loaiDichVu.addElement("");
 		model_loaiDichVu.addElement("Ăn uống");
 		model_loaiDichVu.addElement("Chăm sóc sắc đẹp");
 		model_loaiDichVu.addElement("Tổ chức tiệc");
 		model_loaiDichVu.addElement("Giải trí");
-
-		cbbLoaiDV = new JComboBox(model_loaiDichVu);
-		cbbLoaiDV.setSelectedIndex(0);
-		cbbLoaiDV.setBounds(678, 21, 170, 21);
-		pnTimKiem.add(cbbLoaiDV);
-		
-		JLabel lbGiaDV = new JLabel("Giá dịch vụ:");
-		lbGiaDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lbGiaDV.setBounds(858, 10, 99, 39);
-		pnTimKiem.add(lbGiaDV);
 		
 		DefaultComboBoxModel model_giaDichVu = new DefaultComboBoxModel();
 		model_giaDichVu.addElement("");
@@ -129,10 +101,6 @@ public class QLDVPanel extends JPanel {
 		model_giaDichVu.addElement("Từ 200.000 VND đến 500.000 VND");
 		model_giaDichVu.addElement("Từ 500.000 VND đến 1.000.000 VND");
 		model_giaDichVu.addElement("Trên 1.000.000 VND");
-		
-		cbbGiaDV = new JComboBox(model_giaDichVu);
-		cbbGiaDV.setBounds(967, 21, 253, 21);
-		pnTimKiem.add(cbbGiaDV);
 		
 		btnTimkiem = new JButton("Tìm kiếm");
 		btnTimkiem.setForeground(new Color(255, 255, 255));
@@ -147,6 +115,45 @@ public class QLDVPanel extends JPanel {
 		btnLamMoi.setBackground(new Color(147, 112, 219));
 		btnLamMoi.setBounds(1068, 59, 152, 39);
 		pnTimKiem.add(btnLamMoi);
+		
+		panel = new JPanel();
+		panel.setBackground(new Color(255, 255, 255));
+		panel.setBounds(0, 8, 1220, 39);
+		pnTimKiem.add(panel);
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
+		
+		JLabel lbMaDV = new JLabel("Mã dịch vụ:");
+		panel.add(lbMaDV);
+		lbMaDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		tfMaDV = new JTextField();
+		panel.add(tfMaDV);
+		tfMaDV.setColumns(10);
+		
+		JLabel lbTenDV = new JLabel("Tên dịch vụ:");
+		panel.add(lbTenDV);
+		lbTenDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		tfTenDV = new JTextField();
+		panel.add(tfTenDV);
+		tfTenDV.setColumns(10);
+		
+		JLabel lbLoaiDV = new JLabel("Loại dịch vụ:");
+		panel.add(lbLoaiDV);
+		lbLoaiDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+				cbbLoaiDV = new JComboBox(model_loaiDichVu);
+				cbbLoaiDV.setPreferredSize(new Dimension(150, 30));
+				panel.add(cbbLoaiDV);
+				cbbLoaiDV.setSelectedIndex(0);
+				
+				JLabel lbGiaDV = new JLabel("Giá dịch vụ:");
+				panel.add(lbGiaDV);
+				lbGiaDV.setFont(new Font("Tahoma", Font.PLAIN, 14));
+				
+				cbbGiaDV = new JComboBox(model_giaDichVu);
+				cbbGiaDV.setPreferredSize(new Dimension(260, 30));
+				panel.add(cbbGiaDV);
 		
 		JPanel pnTableDV = new JPanel();
 		pnTableDV.setBackground(new Color(255, 255, 255));
@@ -164,7 +171,18 @@ public class QLDVPanel extends JPanel {
 		scrptbDV.setBounds(6, 47, 798, 592);
 		pnTableDV.add(scrptbDV);
 		
-		tbDV = new JTable();
+		tbDV = new JTable() {
+			@Override
+			protected JTableHeader createDefaultTableHeader() {
+				return new JTableHeader(columnModel) {
+					@Override
+					public void setResizingColumn(TableColumn resizingColumn) {
+						// Disable resizing column
+					}
+				};
+			}
+		};
+		tbDV.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tbDV.setFont(UIManager.getFont("Table.font"));
 		loadTableDichVu();
 		
@@ -197,7 +215,7 @@ public class QLDVPanel extends JPanel {
 		tf_frmMaDV = new JTextField();
 		sl_pnSuaThongTin.putConstraint(SpringLayout.NORTH, tf_frmMaDV, 76, SpringLayout.NORTH, pnSuaThongTin);
 		sl_pnSuaThongTin.putConstraint(SpringLayout.WEST, tf_frmMaDV, 10, SpringLayout.WEST, pnSuaThongTin);
-		sl_pnSuaThongTin.putConstraint(SpringLayout.SOUTH, tf_frmMaDV, 99, SpringLayout.NORTH, pnSuaThongTin);
+		sl_pnSuaThongTin.putConstraint(SpringLayout.SOUTH, tf_frmMaDV, 106, SpringLayout.NORTH, pnSuaThongTin);
 		sl_pnSuaThongTin.putConstraint(SpringLayout.EAST, tf_frmMaDV, 397, SpringLayout.WEST, pnSuaThongTin);
 		pnSuaThongTin.add(tf_frmMaDV);
 		tf_frmMaDV.setEditable(false);
@@ -214,7 +232,7 @@ public class QLDVPanel extends JPanel {
 		tf_frmTenDV = new JTextField();
 		sl_pnSuaThongTin.putConstraint(SpringLayout.NORTH, tf_frmTenDV, 155, SpringLayout.NORTH, pnSuaThongTin);
 		sl_pnSuaThongTin.putConstraint(SpringLayout.WEST, tf_frmTenDV, 10, SpringLayout.WEST, pnSuaThongTin);
-		sl_pnSuaThongTin.putConstraint(SpringLayout.SOUTH, tf_frmTenDV, 178, SpringLayout.NORTH, pnSuaThongTin);
+		sl_pnSuaThongTin.putConstraint(SpringLayout.SOUTH, tf_frmTenDV, 185, SpringLayout.NORTH, pnSuaThongTin);
 		sl_pnSuaThongTin.putConstraint(SpringLayout.EAST, tf_frmTenDV, 397, SpringLayout.WEST, pnSuaThongTin);
 		tf_frmTenDV.setColumns(10);
 		pnSuaThongTin.add(tf_frmTenDV);
@@ -242,11 +260,11 @@ public class QLDVPanel extends JPanel {
 		model_frmLoaiDV.addElement("Giải trí");
 		
 		cbb_frmLoaiDV = new JComboBox(model_frmLoaiDV);
+		sl_pnSuaThongTin.putConstraint(SpringLayout.SOUTH, cbb_frmLoaiDV, 282, SpringLayout.NORTH, pnSuaThongTin);
 		cbb_frmLoaiDV.setFont(new Font("Arial", Font.BOLD, 12));
 		cbb_frmLoaiDV.setEditable(false);
 		sl_pnSuaThongTin.putConstraint(SpringLayout.NORTH, cbb_frmLoaiDV, 252, SpringLayout.NORTH, pnSuaThongTin);
 		sl_pnSuaThongTin.putConstraint(SpringLayout.WEST, cbb_frmLoaiDV, 10, SpringLayout.WEST, pnSuaThongTin);
-		sl_pnSuaThongTin.putConstraint(SpringLayout.SOUTH, cbb_frmLoaiDV, 275, SpringLayout.NORTH, pnSuaThongTin);
 		sl_pnSuaThongTin.putConstraint(SpringLayout.EAST, cbb_frmLoaiDV, 397, SpringLayout.WEST, pnSuaThongTin);
 		pnSuaThongTin.add(cbb_frmLoaiDV);
 		
@@ -312,8 +330,9 @@ public class QLDVPanel extends JPanel {
 		
 		tf_frmGiaDV = new JTextField();
 		sl_pnSuaThongTin.putConstraint(SpringLayout.NORTH, tf_frmGiaDV, 6, SpringLayout.SOUTH, lbGiaDV_1);
-		sl_pnSuaThongTin.putConstraint(SpringLayout.WEST, tf_frmGiaDV, 0, SpringLayout.WEST, lbMaDV_1);
-		sl_pnSuaThongTin.putConstraint(SpringLayout.EAST, tf_frmGiaDV, 0, SpringLayout.EAST, tf_frmMaDV);
+		sl_pnSuaThongTin.putConstraint(SpringLayout.WEST, tf_frmGiaDV, 10, SpringLayout.WEST, pnSuaThongTin);
+		sl_pnSuaThongTin.putConstraint(SpringLayout.SOUTH, tf_frmGiaDV, 36, SpringLayout.SOUTH, lbGiaDV_1);
+		sl_pnSuaThongTin.putConstraint(SpringLayout.EAST, tf_frmGiaDV, -10, SpringLayout.EAST, pnSuaThongTin);
 		tf_frmGiaDV.setColumns(10);
 		pnSuaThongTin.add(tf_frmGiaDV);
 		
@@ -466,6 +485,11 @@ public class QLDVPanel extends JPanel {
 		};
 	
 		tbDV.setModel(dtm);
+		TableColumnModel columnModelDSNV = tbDV.getColumnModel();
+		for (int i = 0; i < lengthColumn.length; i++) {
+			columnModelDSNV.getColumn(i).setPreferredWidth(lengthColumn[i]);
+		}
+		
 		for(int i=0; i<listDV.size(); i++) {
 			DichVuDTO dichVu = listDV.get(i);
 			Object[] row = {dichVu.getMaDV(), 
@@ -524,6 +548,11 @@ public class QLDVPanel extends JPanel {
 									dichVu.getGiaDV()
 									};
 					dtm.addRow(row);
+				}
+				
+				TableColumnModel columnModelDSNV = tbDV.getColumnModel();
+				for (int i = 0; i < lengthColumn.length; i++) {
+					columnModelDSNV.getColumn(i).setPreferredWidth(lengthColumn[i]);
 				}
 			}
 		});	

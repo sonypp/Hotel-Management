@@ -178,6 +178,16 @@ public class HoaDonBUS {
 	            "where Year(ngayThanhToan) = " + year + " and Month(ngayThanhToan) = " + month + " and Day(ngayThanhToan) = " + day;
 	    return db.executeNonQueryGetInteger(query);
 	}
+	
+	public ResultSet getHoaDon(String maHD)
+	{
+		String query = "SELECT HoaDon.maHD, HoaDon.maCTT, NhanVien.tenNV, HoaDon.ngayThanhToan " +
+	               "FROM HoaDon " +
+	               "JOIN ChiTietThue ON HoaDon.maCTT = ChiTietThue.maCTT " +
+	               "JOIN NhanVien ON ChiTietThue.maNV = NhanVien.maNV " +
+	               "WHERE HoaDon.maHD = '" + maHD + "'";
+	    return db.getList(query);
+	}
 
 	public int TongTienPhongTrongMotThang(String month, String year) {
 	    String query = "select case when SUM(TongTienPhong) is not null then SUM(TongTienPhong) else 0 end as TP from (select HOADON.maHD, HOADON.maCTT, tenNV, " +
@@ -210,6 +220,24 @@ public class HoaDonBUS {
 	            "group by HOADON.maHD) as TIENDICHVU on HOADON.maHD = TIENDICHVU.maHD " +
 	            "group by HOADON.maHD, HOADON.maCTT, tenNV, TIENPHONG.tienPhong, TIENDICHVU.tienDichVu, giamGia, phuThu, ngayThanhToan, phuongThucThanhToan) as TBHoaDon " +
 	            "where Year(ngayThanhToan) = " + year + " and Month(ngayThanhToan) = " + month;
+	    return db.executeNonQueryGetInteger(query);
+	}
+	
+	public ResultSet getDichVu(String maHD)
+	{
+		String query = "select tenDV, loaiDV, ngaySuDung, SoLuong, ChiTietThueDichVu.giaDV, (SoLuong*ChiTietThueDichVu.giaDV) as Tong from CHITIETTHUEDICHVU, DICHVU, HOADON \r\nwhere CHITIETTHUEDICHVU.maCTT = HOADON.maCTT and CHITIETTHUEDICHVU.maDV = DICHVU.maDV and maHD = '" + maHD + "'";
+	    return db.getList(query);
+	}
+	
+	public void ThemHoaDon(String maHD, String maCTT, int giamGia, int phuThu, Date ngayThanhToan, int pttt)
+	{
+	    String query = "insert into HOADON values(?,?, ?, ?, ?, ?, 0)";
+	    db.executeNonQuery(query, new Object[] {maHD, maCTT, giamGia, phuThu, ngayThanhToan, pttt});
+	}
+	
+	public int SoLuongHD(String dateNow)
+	{
+	    String query = "select COUNT(MaHD) + 1 from HOADON where cast(ngayThanhToan as date) = '" + dateNow + "'";
 	    return db.executeNonQueryGetInteger(query);
 	}
 

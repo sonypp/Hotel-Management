@@ -74,6 +74,7 @@ public class BookingNew extends JPanel {
 	private JComboBox cbbLoaiPhong;
 	private JComboBox cbbTTPhong;
 	private JComboBox cbbHienTrang;
+	public JButton btnLamMoi;
 
 	/**
 	 * Create the panel.
@@ -213,7 +214,7 @@ public class BookingNew extends JPanel {
         btnTimKiem.setBounds(869, 95, 117, 26);
         panel.add(btnTimKiem);
         
-        JButton btnLamMoi = new JButton("Làm mới");
+        btnLamMoi = new JButton("Làm mới");
         btnLamMoi.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
@@ -235,6 +236,7 @@ public class BookingNew extends JPanel {
 		        rdbtnTheoNgay.setSelected(false);
 		        rdbtnTheoGio.setSelected(false);
 		        rdbtnKhac.setSelected(false);
+		        buttonGroup.clearSelection();
         		isValid = false;
         		setListPhong(phongBUS.getListPhong_DTO());
         	}
@@ -358,8 +360,6 @@ public class BookingNew extends JPanel {
 				            for (ChiTietThueDTO ctt : ctThueList) {
 				                if (cttp.getMaCTT().equals(ctt.getMaCTT())) {
 				                	if(cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0) {
-//				                		System.out.println("Ngay tra ctt: " + cttp.getNgayTra().getHours());
-//				                		System.out.println("Ngay thue tim kiem: " + dateNgayThue.getDate().toString());
 					                    if (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null) {
 						                    cttFiltered.add(phongList.stream()
 						                            .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0)

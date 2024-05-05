@@ -37,7 +37,7 @@ public class FormChiTietThue extends JPanel {
 	private JTextField txt_NgayLapPhieu;
 	private JTextField txtTienDatCoc;
 	private JTextField txt_TinhTrang;
-	public JComboBox cbMaCTT;
+	public JComboBox<String> cbMaCTT;
 	
 	ChiTietThueBUS cttBus = new ChiTietThueBUS();
 	KhachHangBUS khachHang = new KhachHangBUS();
@@ -61,154 +61,161 @@ public class FormChiTietThue extends JPanel {
         setLayout(null);
         
         JPanel panel = new JPanel();
-        panel.setBounds(10, 27, 373, 798);
+        panel.setBounds(10, 10, 301, 815);
         add(panel);
         panel.setLayout(null);
         
         pnALL = new JPanel();
         pnALL.setBackground(new Color(255, 255, 255));
         pnALL.setBorder(new LineBorder(new Color(255, 169, 128), 8));
-        pnALL.setBounds(0, 0, 373, 94);
+        pnALL.setBounds(0, 0, 300, 77);
         panel.add(pnALL);
         pnALL.setLayout(null);
         
         JLabel lblNewLabel_1 = new JLabel("Chi tiết thuê");
         lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
-        lblNewLabel_1.setBounds(10, 10, 170, 34);
+        lblNewLabel_1.setBounds(10, 10, 170, 30);
         pnALL.add(lblNewLabel_1);
         
         JLabel lblNewLabel_1_1 = new JLabel("Thông tin phiếu thuê");
         lblNewLabel_1_1.setFont(new Font("Tahoma", Font.ITALIC, 15));
-        lblNewLabel_1_1.setBounds(10, 50, 170, 34);
+        lblNewLabel_1_1.setBounds(10, 39, 170, 34);
         pnALL.add(lblNewLabel_1_1);
         
         pnROOM = new JPanel();
         pnROOM.setLayout(null);
         pnROOM.setBorder(new LineBorder(new Color(255, 169, 128), 8));
         pnROOM.setBackground(Color.WHITE);
-        pnROOM.setBounds(0, 85, 373, 94);
+        pnROOM.setBounds(0, 81, 300, 77);
         panel.add(pnROOM);
         
         JLabel lbChiTietThue = new JLabel("Thuê phòng");
         lbChiTietThue.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
-        lbChiTietThue.setBounds(10, 10, 170, 34);
+        lbChiTietThue.setBounds(10, 10, 170, 30);
         pnROOM.add(lbChiTietThue);
         
         JLabel lblNewLabel_1_1_1 = new JLabel("Thuê phòng mới cho khách hàng");
         lblNewLabel_1_1_1.setFont(new Font("Tahoma", Font.ITALIC, 15));
-        lblNewLabel_1_1_1.setBounds(10, 50, 257, 34);
+        lblNewLabel_1_1_1.setBounds(10, 39, 257, 34);
         pnROOM.add(lblNewLabel_1_1_1);
         
         pnSERVICE = new JPanel();
         pnSERVICE.setLayout(null);
         pnSERVICE.setBorder(new LineBorder(new Color(255, 169, 128), 8));
         pnSERVICE.setBackground(Color.WHITE);
-        pnSERVICE.setBounds(0, 174, 373, 94);
+        pnSERVICE.setBounds(0, 161, 300, 77);
         panel.add(pnSERVICE);
         
         JLabel lblThuDchV = new JLabel("Thuê dịch vụ");
         lblThuDchV.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
-        lblThuDchV.setBounds(10, 10, 170, 34);
+        lblThuDchV.setBounds(10, 10, 170, 30);
         pnSERVICE.add(lblThuDchV);
         
         JLabel lblNewLabel_1_1_1_1 = new JLabel("Thuê dịch vụ mới khách hàng");
         lblNewLabel_1_1_1_1.setFont(new Font("Tahoma", Font.ITALIC, 15));
-        lblNewLabel_1_1_1_1.setBounds(10, 50, 257, 34);
+        lblNewLabel_1_1_1_1.setBounds(10, 39, 257, 34);
         pnSERVICE.add(lblNewLabel_1_1_1_1);
         
         JLabel lblNewLabel_2 = new JLabel("Thông tin phiếu thuê");
         lblNewLabel_2.setForeground(new Color(255, 112, 43));
         lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 17));
-        lblNewLabel_2.setBounds(0, 269, 373, 43);
+        lblNewLabel_2.setBounds(0, 254, 301, 28);
         panel.add(lblNewLabel_2);
         
         JLabel lblNewLabel_3 = new JLabel("Mã chi tiết thuê:");
         lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblNewLabel_3.setBounds(10, 322, 157, 28);
+        lblNewLabel_3.setBounds(10, 274, 157, 28);
         panel.add(lblNewLabel_3);
         
         JLabel lblN = new JLabel("Họ tên khách hàng:");
         lblN.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblN.setBounds(13, 391, 144, 36);
+        lblN.setBounds(13, 331, 144, 36);
         panel.add(lblN);
         
-        cbMaCTT = new JComboBox();
+        cbMaCTT = new JComboBox<String>();
         cbMaCTT.addItemListener(new ItemListener() {
         	public void itemStateChanged(ItemEvent e) {
         		cbMaCTT_ItemStateChanged();
         	}
         });
-        cbMaCTT.setBounds(10, 360, 353, 21);
+        cbMaCTT.setBounds(10, 300, 269, 28);
         panel.add(cbMaCTT);
         
         txt_TenKH = new JTextField();
-        txt_TenKH.setBounds(10, 425, 353, 19);
+        txt_TenKH.setEditable(false);
+        txt_TenKH.setBounds(10, 365, 269, 28);
         panel.add(txt_TenKH);
         txt_TenKH.setColumns(10);
         
         JLabel lblCmndcccd = new JLabel("CMND/CCCD");
         lblCmndcccd.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblCmndcccd.setBounds(13, 454, 144, 43);
+        lblCmndcccd.setBounds(13, 394, 144, 43);
         panel.add(lblCmndcccd);
         
         txt_CMND = new JTextField();
+        txt_CMND.setEditable(false);
         txt_CMND.setColumns(10);
-        txt_CMND.setBounds(10, 489, 353, 19);
+        txt_CMND.setBounds(10, 429, 269, 28);
         panel.add(txt_CMND);
         
         JLabel lblN_1_1 = new JLabel("Số điện thoại:");
         lblN_1_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblN_1_1.setBounds(13, 526, 144, 36);
+        lblN_1_1.setBounds(13, 460, 144, 36);
         panel.add(lblN_1_1);
         
         txt_SDT = new JTextField();
+        txt_SDT.setEditable(false);
         txt_SDT.setColumns(10);
-        txt_SDT.setBounds(13, 556, 350, 19);
+        txt_SDT.setBounds(13, 490, 266, 28);
         panel.add(txt_SDT);
         
         JLabel lblN_1_2 = new JLabel("Họ tên nhân viên lập phiếu:");
         lblN_1_2.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblN_1_2.setBounds(13, 582, 228, 36);
+        lblN_1_2.setBounds(13, 516, 228, 36);
         panel.add(lblN_1_2);
         
         txt_TenNV = new JTextField();
+        txt_TenNV.setEditable(false);
         txt_TenNV.setColumns(10);
-        txt_TenNV.setBounds(13, 612, 350, 19);
+        txt_TenNV.setBounds(13, 546, 266, 28);
         panel.add(txt_TenNV);
         
         txt_NgayLapPhieu = new JTextField();
+        txt_NgayLapPhieu.setEditable(false);
         txt_NgayLapPhieu.setColumns(10);
-        txt_NgayLapPhieu.setBounds(13, 660, 350, 19);
+        txt_NgayLapPhieu.setBounds(13, 606, 266, 28);
         panel.add(txt_NgayLapPhieu);
         
         JLabel lblN_1_2_1 = new JLabel("Ngày lập phiếu");
         lblN_1_2_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblN_1_2_1.setBounds(10, 628, 228, 33);
+        lblN_1_2_1.setBounds(10, 574, 228, 33);
         panel.add(lblN_1_2_1);
         
         txtTienDatCoc = new JTextField();
+        txtTienDatCoc.setEditable(false);
         txtTienDatCoc.setColumns(10);
-        txtTienDatCoc.setBounds(10, 717, 350, 19);
+        txtTienDatCoc.setBounds(10, 663, 269, 28);
         panel.add(txtTienDatCoc);
         
         JLabel lblN_1_2_1_1 = new JLabel("Tiền đặt cọc");
         lblN_1_2_1_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblN_1_2_1_1.setBounds(10, 684, 228, 36);
+        lblN_1_2_1_1.setBounds(10, 630, 228, 36);
         panel.add(lblN_1_2_1_1);
         
         txt_TinhTrang = new JTextField();
+        txt_TinhTrang.setEditable(false);
         txt_TinhTrang.setColumns(10);
-        txt_TinhTrang.setBounds(10, 769, 350, 19);
+        txt_TinhTrang.setBounds(10, 715, 269, 28);
         panel.add(txt_TinhTrang);
         
         JLabel lblN_1_2_1_1_1 = new JLabel("Tình trạng xử lý");
         lblN_1_2_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblN_1_2_1_1_1.setBounds(10, 738, 228, 36);
+        lblN_1_2_1_1_1.setBounds(10, 684, 228, 36);
         panel.add(lblN_1_2_1_1_1);
         
         pnContent = new JPanel();
-        pnContent.setBounds(411, 27, 830, 798);
+        pnContent.setBounds(321, 10, 920, 815);
         add(pnContent);
         pnContent.setLayout(null);
         
@@ -216,7 +223,6 @@ public class FormChiTietThue extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 ResetBackAndBorder();
-                pnALL.setBackground(pnClicked);
                 pnALL.setBackground(pnBorder);
                 HienThiALL();
             }
@@ -226,7 +232,6 @@ public class FormChiTietThue extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 ResetBackAndBorder();
-                pnROOM.setBackground(pnClicked);
                 pnROOM.setBackground(pnBorder);
                 HienThiROOM();
             }
@@ -236,14 +241,13 @@ public class FormChiTietThue extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 ResetBackAndBorder();
-                pnSERVICE.setBackground(pnClicked);
                 pnSERVICE.setBackground(pnBorder);
                 HienThiSERVICE();
             }
         });
         
-        HienThiALL();
         HienThiMaCTT();
+        renderAll();
         if (option == 0) {                
             for (int i = 0; i < cbMaCTT.getItemCount(); i++) {
                 if (cbMaCTT.getItemAt(i).toString().contains(maCTT)) {
@@ -321,40 +325,69 @@ public class FormChiTietThue extends JPanel {
     }
 
 	private void HienThiALL() {
-	    pnContent.removeAll();
+	    for(var comp : pnContent.getComponents())
+	    {
+	    	if(comp instanceof FormChiTietPhieuThue || comp instanceof FormChiTietThuePhong || comp instanceof FormChiTietThueDichVu)
+	    	{
+	    		comp.setVisible(false);
+	    		comp.setEnabled(false);
+	    	}
+	    }
 	    if (txt_TinhTrang.getText().equals("Chưa xử lý")) {
 	        FormChiTietPhieuThue frmCTT = new FormChiTietPhieuThue(cbMaCTT.getSelectedItem().toString(), 0, this);
 	        pnContent.add(frmCTT);
 	        frmCTT.setVisible(true);
 	        pnROOM.setVisible(true);
 	        pnSERVICE.setVisible(true);
+	        pnContent.repaint();
+	        pnContent.revalidate();
 	    } else {
 	        FormChiTietPhieuThue frmCTT = new FormChiTietPhieuThue(cbMaCTT.getSelectedItem().toString(), 1, this);
 	        pnContent.add(frmCTT);
 	        frmCTT.setVisible(true);
 	        pnROOM.setVisible(false);
 	        pnSERVICE.setVisible(false);
+	        pnContent.repaint();
+	        pnContent.revalidate();
 	    }
 	}
 
 	private void HienThiROOM() {
-	    pnContent.removeAll();
+		for(var comp : pnContent.getComponents())
+	    {
+	    	if(comp instanceof FormChiTietPhieuThue || comp instanceof FormChiTietThuePhong || comp instanceof FormChiTietThueDichVu)
+	    	{
+	    		comp.setVisible(false);
+	    		comp.setEnabled(false);
+	    	}
+	    }
 	    FormChiTietThuePhong frmCTT = new FormChiTietThuePhong(cbMaCTT.getSelectedItem().toString(), this);
 	    pnContent.add(frmCTT);
 	    frmCTT.setVisible(true);
+	    pnContent.repaint();
+        pnContent.revalidate();
 	}
 
 	public void renderAll() {
 	    ResetBackAndBorder();
-	    pnALL.setBackground(pnClicked);
+	    pnALL.setBackground(pnBorder);
 	    HienThiALL();
 	}
 
 	private void HienThiSERVICE() {
-	    pnContent.removeAll();
+		for(var comp : pnContent.getComponents())
+	    {
+	    	if(comp instanceof FormChiTietPhieuThue || comp instanceof FormChiTietThuePhong || comp instanceof FormChiTietThueDichVu)
+	    	{
+	    		comp.setVisible(false);
+	    		comp.setEnabled(false);
+	    	}
+	    }
 	    FormChiTietThueDichVu frmCTT = new FormChiTietThueDichVu(cbMaCTT.getSelectedItem().toString(), this);
 	    pnContent.add(frmCTT);
 	    frmCTT.setVisible(true);
+	    pnContent.repaint();
+        pnContent.revalidate();
 	}
 
 	private void ResetInformation() {

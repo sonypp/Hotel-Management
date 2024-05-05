@@ -14,6 +14,7 @@ import java.awt.Toolkit;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -33,6 +34,8 @@ import DTO.TaiKhoanDTO;
 import GUI.Home.HomeForm;
 
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.awt.event.ActionEvent;
 import java.awt.Component;
@@ -65,6 +68,20 @@ public class FormDangNhap extends JFrame {
 	            e.printStackTrace();
 	        }
 	    });
+	}
+	
+	private void homeForm_Closing()
+	{
+		int option = JOptionPane.showConfirmDialog(null,
+                "Bạn có chắc chắn muốn thoát?", "", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            this.setVisible(true);
+        }
+	}
+	
+	private void hideThis()
+	{
+		this.setVisible(false);
 	}
 
 	/**
@@ -140,14 +157,18 @@ public class FormDangNhap extends JFrame {
 				else
 				{
 					
-					dispose();
 					var nvBUS = new NhanVienBUS();
 					HomeForm.nhanVien = nvBUS.getNVDTO(tk.getMaNV());
 					HomeForm hf = new HomeForm();
-					
-					
-					
+					hf.addWindowListener(new WindowAdapter() {
+					    @Override
+					    public void windowClosing(WindowEvent e) {
+					        homeForm_Closing();
+					    }
+					});
+
 					hf.setVisible(true);
+					hideThis();
 				}
 			}
 			

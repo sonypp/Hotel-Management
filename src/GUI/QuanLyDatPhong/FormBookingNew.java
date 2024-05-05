@@ -695,9 +695,11 @@ public class FormBookingNew extends JPanel {
 			                resetFieldBackgroundColors(Color.WHITE);
 			                enableCustomerInfoFields(false);
 			                frmSearch.dispose();
+							var source = (Timer)e.getSource();
+	                    	source.stop();
 			            }
 	        		}
-	            }).start();;
+	            }).start();
 	        }
 	    }
 	}
@@ -987,6 +989,8 @@ public class FormBookingNew extends JPanel {
 	                    
 	                    JOptionPane.showMessageDialog(null, "Thêm phiếu thuê mới thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
 	                    XuatFilePDF();
+	                    var parent = (JFrame) getParentFrame(this);
+	                    parent.dispose();
 	                }
 	            }
 	        } else {
@@ -1063,6 +1067,8 @@ public class FormBookingNew extends JPanel {
 		                
 		                JOptionPane.showMessageDialog(null, "Thêm phiếu thuê mới thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
 		                XuatFilePDF();
+		                var parent = (JFrame) getParentFrame(this);
+	                    parent.dispose();
 	                } catch (ParseException e) {
 	                	// TODO Auto-generated catch block
 	                	e.printStackTrace();
@@ -1187,6 +1193,13 @@ public class FormBookingNew extends JPanel {
 	    } catch (DocumentException | IOException e) {
 	        e.printStackTrace();
 	    }
+	}
+	
+	private Component getParentFrame(Component n)
+	{
+		if(n instanceof JFrame)
+			return n;
+		return getParentFrame(n.getParent());
 	}
 	
 	private String getFormattedDate(SimpleDateFormat dateFormat) {

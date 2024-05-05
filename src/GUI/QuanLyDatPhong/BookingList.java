@@ -46,6 +46,8 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JSplitPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class BookingList extends JPanel {
 
@@ -112,12 +114,16 @@ public class BookingList extends JPanel {
 	        
 	        HomeForm form = (HomeForm) getParentForm(this);
 	        JPanel pnContent = form.panelChinh;
-	        pnContent.removeAll();
+	        disposeThis();
 	        pnContent.add(frmBookingNew);
 	        frmBookingNew.setVisible(true);
 	    } else {
 	        JOptionPane.showMessageDialog(null, "Vui lòng chọn phiếu thuê muốn xem chi tiết", "Thông báo", JOptionPane.ERROR_MESSAGE);
 	    }
+	}
+
+	private void disposeThis() {
+		this.setVisible(false);
 	}
 
 	private Container getParentForm(Container container) {
@@ -369,7 +375,7 @@ public class BookingList extends JPanel {
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.WEST, lbl_chiTietThuePhong, 10, SpringLayout.WEST, pnl_chiTietThuePhong);
         pnl_chiTietThuePhong.add(lbl_chiTietThuePhong);
         
-        String column[] = {"STT","MÃ CT THUÊ", "MÃ KHÁCH HÀNG", "TÊN KHÁCH HÀNG", "MÃ NHÂN VIÊN", "NHÂN VIÊN LẬP PHIẾU", "NGÀY LẬP PHIẾU", "TIỀN ĐẶT CỌC", "TÌNH TRẠNG"};
+        String column[] = {"STT","MÃ CT THUÊ", "MÃ KHÁCH HÀNG", "TÊN KHÁCH HÀNG", "MÃ NHÂN VIÊN", "NHÂN VIÊN LẬP PHIẾU", "NGÀY LẬP PHIẾU", "TIỀN ĐẶT CỌC", "TÌNH TRẠNG", "XÓA"};
         String data[][] = {};
         
         tbRoomModel = new DefaultTableModel(data, column);
@@ -406,16 +412,22 @@ public class BookingList extends JPanel {
         JScrollPane scrp_chiTietThuePhong = new JScrollPane(tbRoom);
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.NORTH, scrp_chiTietThuePhong, 6, SpringLayout.SOUTH, lbl_chiTietThuePhong);
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.WEST, scrp_chiTietThuePhong, 10, SpringLayout.WEST, pnl_chiTietThuePhong);
-        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.SOUTH, scrp_chiTietThuePhong, 437, SpringLayout.SOUTH, lbl_chiTietThuePhong);
+        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.SOUTH, scrp_chiTietThuePhong, 386, SpringLayout.SOUTH, lbl_chiTietThuePhong);
         sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.EAST, scrp_chiTietThuePhong, 1221, SpringLayout.WEST, pnl_chiTietThuePhong);
         pnl_chiTietThuePhong.add(scrp_chiTietThuePhong);
 	
         JButton btnView = new JButton("Xem chi tiết");
+        btnView.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		btnView_Click();
+        	}
+        });
+        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.NORTH, btnView, 6, SpringLayout.SOUTH, scrp_chiTietThuePhong);
+        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.SOUTH, btnView, -65, SpringLayout.SOUTH, pnl_chiTietThuePhong);
+        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.EAST, btnView, 0, SpringLayout.EAST, scrp_chiTietThuePhong);
         btnView.setBackground(new Color(147, 112, 219));
         btnView.setForeground(new Color(255, 255, 255));
-        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.NORTH, btnView, 6, SpringLayout.SOUTH, scrp_chiTietThuePhong);
-        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.SOUTH, btnView, -14, SpringLayout.SOUTH, pnl_chiTietThuePhong);
-        sl_pnl_chiTietThuePhong.putConstraint(SpringLayout.EAST, btnView, -10, SpringLayout.EAST, pnl_chiTietThuePhong);
         btnView.setFont(new Font("Tahoma", Font.BOLD, 12));
         
 
