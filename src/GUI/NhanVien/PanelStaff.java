@@ -28,16 +28,18 @@ import com.toedter.calendar.JDateChooser;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.logging.SimpleFormatter;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
+import java.awt.event.*;
 
 public class PanelStaff extends JPanel {
 	public static int width = 1251;
-	public static int height = 835;
+	public static int height = 735;
 	public static int[] lengthColumn = {50,120,300,100,120,120,100,150,150,250};
 	private static String[] optionChucVu = {"Quản lý","Lễ tân","Kế Toán","Bếp"};
 	private static String[] optionGioiTinh = {"Nam","Nữ"};
@@ -63,7 +65,6 @@ public class PanelStaff extends JPanel {
 	private List<NhanVienDTO> dataDSNV;
 	private JDateChooser dateVaoLam_from;
 	private NhanVienBUS busNhanVien;
-	private JDateChooser dateVaoLam_to;
 	private JDateChooser dateNgaySinh_from;
 	private JDateChooser dateNgaySinh_to;
 	private JSpinner spinLuong1Ngay_min;
@@ -76,7 +77,6 @@ public class PanelStaff extends JPanel {
 	private JLabel lblGioiTinh;
 	private JLabel lblChucVu;
 	private JLabel lblNgayVaoLam_from;
-	private JLabel lblNgayVaoLam_to;
 	private JLabel lblNgaySinh_from;
 	private JLabel lblNgaySinh_to;
 	private JLabel lblLuong1Ngay_min;
@@ -86,6 +86,8 @@ public class PanelStaff extends JPanel {
 	private JLabel lblKetQuaTimKiem;
 
 	private ExcelServiceStaff serviceStaff;
+	private JDateChooser dateVaoLam_to;
+	private JLabel lblNgayVaoLam_to;
 	/**
 	 * Create the panel.
 	 */
@@ -93,7 +95,6 @@ public class PanelStaff extends JPanel {
 		setBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(192, 192, 192)));
 		setBounds(new Rectangle(0, 0, this.width, this.height));
 		setBackground(new Color(245, 245, 245));
-		setBounds(0, 0, 1251, 835);
 		setLayout(null);
 
 		serviceStaff = new ExcelServiceStaff();
@@ -153,7 +154,7 @@ public class PanelStaff extends JPanel {
 		panelThuocTinh_input.add(lblGioiTinh);
 
 		cbBoxGioiTinh = new JComboBox<>(optionGioiTinh);
-		cbBoxGioiTinh.setPreferredSize(new Dimension(70, 30));
+		cbBoxGioiTinh.setPreferredSize(new Dimension(80, 30));
 		cbBoxGioiTinh.setMinimumSize(new Dimension(140, 30));
 		cbBoxGioiTinh.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		cbBoxGioiTinh.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -166,7 +167,7 @@ public class PanelStaff extends JPanel {
 		panelThuocTinh_input.add(lblChucVu);
 
 		cbBoxChucVu = new JComboBox<>(optionChucVu);
-		cbBoxChucVu.setPreferredSize(new Dimension(100, 30));
+		cbBoxChucVu.setPreferredSize(new Dimension(110, 30));
 		cbBoxChucVu.setMinimumSize(new Dimension(80, 30));
 		cbBoxChucVu.setBackground(new Color(248, 248, 255));
 		cbBoxChucVu.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -174,7 +175,8 @@ public class PanelStaff extends JPanel {
 		cbBoxChucVu.setSelectedIndex(-1);
 		panelThuocTinh_input.add(cbBoxChucVu);
 		
-		lblNgayVaoLam_from = new JLabel("Ngày Vào Làm từ");
+		lblNgayVaoLam_from = new JLabel("Ngày Vào Làm từ  ");
+		lblNgayVaoLam_from.setPreferredSize(new Dimension(118, 20));
 		lblNgayVaoLam_from.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		panelThuocTinh_input.add(lblNgayVaoLam_from);
 		
@@ -190,7 +192,52 @@ public class PanelStaff extends JPanel {
 		dateVaoLam_from.setPreferredSize(new Dimension(150, 30));
 		panelThuocTinh_input.add(dateVaoLam_from);
 		
+		lblNgaySinh_from = new JLabel("Ngày Sinh từ   ");
+		lblNgaySinh_from.setPreferredSize(new Dimension(90, 20));
+		lblNgaySinh_from.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		panelThuocTinh_input.add(lblNgaySinh_from);
+		
+		dateNgaySinh_from = new JDateChooser();
+		dateNgaySinh_from.getCalendarButton().setHideActionText(true);
+		dateNgaySinh_from.getCalendarButton().setForeground(UIManager.getColor("activeCaption"));
+		dateNgaySinh_from.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
+		dateNgaySinh_from.getCalendarButton().setBackground((Color) null);
+		dateNgaySinh_from.setPreferredSize(new Dimension(160, 30));
+		dateNgaySinh_from.setForeground((Color) null);
+		dateNgaySinh_from.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		dateNgaySinh_from.setDateFormatString("dd/MM/yyyy");
+		dateNgaySinh_from.setBackground((Color) null);
+		panelThuocTinh_input.add(dateNgaySinh_from);
+
+		SpinnerNumberModel modelLuong1Ngay_min = new SpinnerNumberModel(0,0,5000000,1000);
+		SpinnerNumberModel modelLuong1Ngay_max = new SpinnerNumberModel(0,0,5000000,1000);
+		
+		SpinnerNumberModel modelSoNgayPhep_min = new SpinnerNumberModel(0,0,30,1);
+		SpinnerNumberModel modelSoNgayPhep_max = new SpinnerNumberModel(0,0,30,1);
+		
+		lblLuong1Ngay_min = new JLabel("Lương 1 ngày từ");
+		lblLuong1Ngay_min.setMaximumSize(new Dimension(112, 20));
+		lblLuong1Ngay_min.setMinimumSize(new Dimension(112, 20));
+		lblLuong1Ngay_min.setPreferredSize(new Dimension(114, 20));
+		lblLuong1Ngay_min.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		panelThuocTinh_input.add(lblLuong1Ngay_min);
+		
+		spinLuong1Ngay_min = new JSpinner(modelLuong1Ngay_min);
+		spinLuong1Ngay_min.setPreferredSize(new Dimension(160, 30));
+		spinLuong1Ngay_min.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		panelThuocTinh_input.add(spinLuong1Ngay_min);
+		lblSoNgayPhep_min = new JLabel("Số ngày nghỉ phép từ");
+		lblSoNgayPhep_min.setPreferredSize(new Dimension(140, 20));
+		lblSoNgayPhep_min.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		panelThuocTinh_input.add(lblSoNgayPhep_min);
+		
+		spinSoNgayPhep_min = new JSpinner(modelSoNgayPhep_min);
+		spinSoNgayPhep_min.setPreferredSize(new Dimension(80, 30));
+		spinSoNgayPhep_min.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		panelThuocTinh_input.add(spinSoNgayPhep_min);
+		
 		lblNgayVaoLam_to = new JLabel("Ngày Vào Làm đến");
+		lblNgayVaoLam_to.setPreferredSize(new Dimension(118, 20));
 		lblNgayVaoLam_to.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		panelThuocTinh_input.add(lblNgayVaoLam_to);
 		
@@ -206,23 +253,8 @@ public class PanelStaff extends JPanel {
 		dateVaoLam_to.setBackground((Color) null);
 		panelThuocTinh_input.add(dateVaoLam_to);
 		
-		lblNgaySinh_from = new JLabel("Ngày Sinh từ");
-		lblNgaySinh_from.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		panelThuocTinh_input.add(lblNgaySinh_from);
-		
-		dateNgaySinh_from = new JDateChooser();
-		dateNgaySinh_from.getCalendarButton().setHideActionText(true);
-		dateNgaySinh_from.getCalendarButton().setForeground(UIManager.getColor("activeCaption"));
-		dateNgaySinh_from.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
-		dateNgaySinh_from.getCalendarButton().setBackground((Color) null);
-		dateNgaySinh_from.setPreferredSize(new Dimension(160, 30));
-		dateNgaySinh_from.setForeground((Color) null);
-		dateNgaySinh_from.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		dateNgaySinh_from.setDateFormatString("dd/MM/yyyy");
-		dateNgaySinh_from.setBackground((Color) null);
-		panelThuocTinh_input.add(dateNgaySinh_from);
-		
 		lblNgaySinh_to = new JLabel("Ngày Sinh đến");
+		lblNgaySinh_to.setPreferredSize(new Dimension(90, 20));
 		lblNgaySinh_to.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		panelThuocTinh_input.add(lblNgaySinh_to);
 		
@@ -237,39 +269,19 @@ public class PanelStaff extends JPanel {
 		dateNgaySinh_to.setDateFormatString("dd/MM/yyyy");
 		dateNgaySinh_to.setBackground((Color) null);
 		panelThuocTinh_input.add(dateNgaySinh_to);
-
-		SpinnerNumberModel modelLuong1Ngay_min = new SpinnerNumberModel(0,0,5000000,1000);
-		SpinnerNumberModel modelLuong1Ngay_max = new SpinnerNumberModel(0,0,5000000,1000);
-		lblLuong1Ngay_min = new JLabel("Lương 1 ngày từ ");
-		lblLuong1Ngay_min.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		panelThuocTinh_input.add(lblLuong1Ngay_min);
-
-		spinLuong1Ngay_min = new JSpinner(modelLuong1Ngay_min);
-		spinLuong1Ngay_min.setPreferredSize(new Dimension(120, 30));
-		spinLuong1Ngay_min.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		panelThuocTinh_input.add(spinLuong1Ngay_min);
 		
 		lblLuong1Ngay_max = new JLabel("Lương 1 ngày đến");
+		lblLuong1Ngay_max.setPreferredSize(new Dimension(114, 20));
 		lblLuong1Ngay_max.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		panelThuocTinh_input.add(lblLuong1Ngay_max);
 		
 		spinLuong1Ngay_max = new JSpinner(modelLuong1Ngay_max);
-		spinLuong1Ngay_max.setPreferredSize(new Dimension(120, 30));
+		spinLuong1Ngay_max.setPreferredSize(new Dimension(160, 30));
 		spinLuong1Ngay_max.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		panelThuocTinh_input.add(spinLuong1Ngay_max);
-
-		SpinnerNumberModel modelSoNgayPhep_min = new SpinnerNumberModel(0,0,30,1);
-		SpinnerNumberModel modelSoNgayPhep_max = new SpinnerNumberModel(0,0,30,1);
-		lblSoNgayPhep_min = new JLabel("Số ngày nghỉ phép từ ");
-		lblSoNgayPhep_min.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		panelThuocTinh_input.add(lblSoNgayPhep_min);
-		
-		spinSoNgayPhep_min = new JSpinner(modelSoNgayPhep_min);
-		spinSoNgayPhep_min.setPreferredSize(new Dimension(80, 30));
-		spinSoNgayPhep_min.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		panelThuocTinh_input.add(spinSoNgayPhep_min);
 		
 		lblSoNgayPhep_max = new JLabel("Số ngày nghỉ phép đến");
+		lblSoNgayPhep_max.setPreferredSize(new Dimension(140, 20));
 		lblSoNgayPhep_max.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		panelThuocTinh_input.add(lblSoNgayPhep_max);
 		
@@ -356,7 +368,7 @@ public class PanelStaff extends JPanel {
 		
 		JPanel panelDSKH = new JPanel();
 		panelDSKH.setBackground(new Color(255, 255, 255));
-		panelDSKH.setBounds(25, 299, 1200, 488);
+		panelDSKH.setBounds(25, 299, 1200, 440);
 		add(panelDSKH);
 		panelDSKH.setLayout(null);
 		
@@ -539,14 +551,14 @@ public class PanelStaff extends JPanel {
 
         
 		scrollPaneDSNV = new JScrollPane(tableDSNV);
-		scrollPaneDSNV.setBounds(25, 83, 1150, 316);
+		scrollPaneDSNV.setBounds(25, 83, 1150, 275);
 		panelDSKH.add(scrollPaneDSNV);
 		scrollPaneDSNV.setBackground(SystemColor.window);
 		scrollPaneDSNV.setFont(new Font("Tahoma", Font.BOLD, 14));
 		
 		JPanel panelDSNV_btn_2 = new JPanel();
 		panelDSNV_btn_2.setBackground(Color.WHITE);
-		panelDSNV_btn_2.setBounds(913, 411, 262, 47);
+		panelDSNV_btn_2.setBounds(913, 370, 262, 47);
 		panelDSKH.add(panelDSNV_btn_2);
 		panelDSNV_btn_2.setLayout(new GridLayout(1, 2, 20, 5));
 		
@@ -645,11 +657,12 @@ public class PanelStaff extends JPanel {
 	}
 	public void setTableData(List<NhanVienDTO> listNhanVien){
 		// Thêm dữ liệu từ listNV vào model
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		modelDSNV.setRowCount(0);
 		int stt = 1;
 		for (NhanVienDTO nv : listNhanVien) {
 			modelDSNV.addRow(new Object[]
-					{stt++,nv.getMaNV(), nv.getTenNV(), optionGioiTinh[nv.getGioiTinh()],nv.getNgaySinh(),nv.getNgayVaoLam(), optionChucVu[nv.getChucVu()], nv.getSoNgayPhep(),nv.getLuong1Ngay(),nv.getEmail()});
+					{stt++,nv.getMaNV(), nv.getTenNV(), optionGioiTinh[nv.getGioiTinh()],formatter.format(nv.getNgaySinh()),formatter.format(nv.getNgayVaoLam()), optionChucVu[nv.getChucVu()], nv.getSoNgayPhep(),nv.getLuong1Ngay(),nv.getEmail()});
 		}
 	}
 	public void updateViewTable(){

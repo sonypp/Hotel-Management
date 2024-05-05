@@ -45,7 +45,7 @@ import javax.swing.table.TableColumnModel;
 public class QLTienIch extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private static int[] lengthColumn = {50,150,680};
+	private static int[] lengthColumn = {50,150,500};
 	private JTextField tfTimKiem;
 	private JTextField tfTenTienIch;
 	private JTable tbTienIch;
@@ -74,7 +74,7 @@ public class QLTienIch extends JPanel {
 	 */
 	public QLTienIch() {
 		setBackground(new Color(245, 245, 245));
-		setBounds(0, 0, 1251, 835);
+		setBounds(0, 0, 1251, 735);
 		setLayout(null);
 		
 		JLabel lbDanhSachTienIch = new JLabel("DANH SÁCH TIỆN ÍCH");

@@ -70,7 +70,7 @@ import java.awt.event.ItemEvent;
 public class PanelPosition extends JPanel {
 
 	private int width = 1251;
-	private int height = 835;
+	private int height = 735;
 
 	private static final long serialVersionUID = 1L;
 	private JPanel panelTitle;
@@ -102,7 +102,6 @@ public class PanelPosition extends JPanel {
 		setBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(192, 192, 192)));
 		setBounds(new Rectangle(0, 0, this.width, this.height));
 		setBackground(new Color(245, 245, 245));
-		setBounds(0, 0, 1251, 835);
 		setLayout(null);
 		
 		
@@ -127,7 +126,7 @@ public class PanelPosition extends JPanel {
 		
 		JPanel panelQLTK = new JPanel();
 		panelQLTK.setBackground(new Color(255, 255, 255));
-		panelQLTK.setBounds(25, 98, 681, 673);
+		panelQLTK.setBounds(25, 98, 681, 627);
 		add(panelQLTK);
 		panelQLTK.setLayout(null);
 		
@@ -335,7 +334,7 @@ public class PanelPosition extends JPanel {
 		scrollPaneDSNV = new JScrollPane(tableDSNV);
 		scrollPaneDSNV.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPaneDSNV.setForeground(new Color(255, 255, 255));
-		scrollPaneDSNV.setBounds(10, 242, 661, 343);
+		scrollPaneDSNV.setBounds(10, 242, 661, 301);
 		panelQLTK.add(scrollPaneDSNV);
 		scrollPaneDSNV.setBackground(SystemColor.window);
 		scrollPaneDSNV.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -414,7 +413,7 @@ public class PanelPosition extends JPanel {
 		panelQLQTC = new JPanel();
 		panelQLQTC.setLayout(null);
 		panelQLQTC.setBackground(Color.WHITE);
-		panelQLQTC.setBounds(718, 98, 507, 673);
+		panelQLQTC.setBounds(718, 98, 507, 627);
 		add(panelQLQTC);
 		
 		
@@ -513,7 +512,7 @@ public class PanelPosition extends JPanel {
 		scrollPaneDSCN.setForeground(new Color(105, 105, 105));
 		scrollPaneDSCN.setFont(new Font("Tahoma", Font.BOLD, 14));
 		scrollPaneDSCN.setBackground(new Color(255, 255, 255));
-		scrollPaneDSCN.setBounds(28, 243, 454, 342);
+		scrollPaneDSCN.setBounds(28, 243, 454, 303);
 		panelQLQTC.add(scrollPaneDSCN);
 		
 		btnLuuTrangThai = new JButton("Lưu Trạng Thái");
@@ -532,7 +531,7 @@ public class PanelPosition extends JPanel {
 		btnLuuTrangThai.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnLuuTrangThai.setBorder(UIManager.getBorder("Button.border"));
 		btnLuuTrangThai.setBackground(new Color(0, 128, 0));
-		btnLuuTrangThai.setBounds(337, 595, 145, 35);
+		btnLuuTrangThai.setBounds(337, 556, 145, 35);
 		panelQLQTC.add(btnLuuTrangThai);
 		
 		cbBoxViTri = new JComboBox<>();
