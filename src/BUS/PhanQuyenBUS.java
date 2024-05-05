@@ -1,6 +1,8 @@
 package BUS;
 
 import DAO.Database;
+import DTO.TaiKhoanDTO;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -64,7 +66,4 @@ public class PhanQuyenBUS {
 		var query = "SELECT maPQ FROM TAIKHOAN JOIN NHANVIEN ON TAIKHOAN.maNV = NHANVIEN.maNV WHERE NHANVIEN.maNV = '" + maNV +"';";
 		return db.executeNonQueryGetInteger(query);
 	}
-
-
-
 }

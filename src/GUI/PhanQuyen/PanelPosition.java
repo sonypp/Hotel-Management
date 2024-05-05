@@ -455,11 +455,25 @@ public class PanelPosition extends JPanel {
 		btnThemViTri.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String newViTri = JOptionPane.showInputDialog(null, "Nhập vị trí mới", "Thêm vị trí", JOptionPane.PLAIN_MESSAGE);
-				if (newViTri != null && !newViTri.isEmpty()) {
-					String maPQ = String.valueOf(cbBoxViTri.getItemCount());
-		            pqBUS.ThemPhanQuyen(maPQ, newViTri);
-		            cbBoxViTri.addItem(newViTri);
-				}
+				if (newViTri != null && !newViTri.isEmpty())
+				{
+		    		var check = true;
+		    		for(int i = 0; i < cbBoxViTri.getItemCount(); i++)
+		    		{
+		    			if(cbBoxViTri.getItemAt(i).equals(newViTri))
+		    				check = false;
+		    		}
+		    		if(check)
+		    		{
+			    		String maPQ = String.valueOf(cbBoxViTri.getItemCount());
+			            pqBUS.ThemPhanQuyen(maPQ, newViTri);
+			            cbBoxViTri.addItem(newViTri);
+		    		}
+		    		else
+		    		{
+		    			JOptionPane.showMessageDialog(null, "Tên phân quyền bị trùng, vui lòng nhập lại");
+		    		}
+		    	}
 				
 			}
 		});
