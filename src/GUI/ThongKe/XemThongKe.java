@@ -1,11 +1,10 @@
 package GUI.ThongKe;
 
-
-
-//import org.jfree.chart.ChartFactory;
-//import org.jfree.chart.ChartPanel;
-//import org.jfree.chart.JFreeChart;
-//import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -28,21 +27,44 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.SystemColor;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
+
 import javax.swing.SwingConstants;
 import javax.swing.JDesktopPane;
 import java.awt.FlowLayout;
 import javax.swing.JTabbedPane;
+import com.toedter.calendar.JDateChooser;
+
+import BUS.HoaDonBUS;
+
+import java.awt.Dimension;
+import javax.swing.UIManager;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 
 public class XemThongKe extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel pnl_xemThongKe;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField tf_chonNam;
-	private JTextField tf_chonThang;
+	private JDateChooser datefromLP;
+	private JDateChooser datetoLP;
+	private JDateChooser datefromCTLP;
+	private JDateChooser datetoCTLP;
+	private JPanel pnl_bieuDoThang;
+	 Font fontTitle = new Font("Segoe UI", Font.BOLD, 10);
+     Font font = new Font("Segoe UI", Font.PLAIN, 9);
+     HoaDonBUS hd = new HoaDonBUS();
+	private JLabel lbTongDoanhThuDichVu;
+	private JLabel lbTongTienDichVuPhanTich;
+	private JLabel lbTongDoanhThuPhong;
+	private JLabel lbTongTienPhongPhanTich;
+	private JLabel lbTongDoanhThu;
+	private JLabel lbTongDoanhThuPhanTich;
+	private JLabel lbTongPhuThuPhanTich;
+	private JLabel lbTongGiamGiaThanhToan;
+	private JDateChooser dateThang;
+	private JDateChooser dateNam;
 
 	public XemThongKe() {
 		setBounds(0, 0, 1251, 835);
@@ -51,7 +73,7 @@ public class XemThongKe extends JPanel {
         setLayout(null);
 		
         pnl_xemThongKe = new JPanel();
-		pnl_xemThongKe.setBounds(0, 0, 1251, 835);
+		pnl_xemThongKe.setBounds(10, 0, 1251, 835);
 		pnl_xemThongKe.setBackground(new Color(245, 245, 245));
 		pnl_xemThongKe.setBorder(new EmptyBorder(5, 5, 5, 5));
 		pnl_xemThongKe.setLayout(null);
@@ -81,12 +103,12 @@ public class XemThongKe extends JPanel {
 		lbl_tieuDePTich.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		pnl_phanTichDoanhThu.add(lbl_tieuDePTich);
 		
-		JLabel lbl_soLieuDoanhThu = new JLabel("702,500 VNĐ");
-		lbl_soLieuDoanhThu.setHorizontalAlignment(SwingConstants.CENTER);
-		lbl_soLieuDoanhThu.setForeground(new Color(0, 128, 128));
-		lbl_soLieuDoanhThu.setBounds(10, 71, 283, 80);
-		lbl_soLieuDoanhThu.setFont(new Font("Tahoma", Font.BOLD, 20));
-		pnl_phanTichDoanhThu.add(lbl_soLieuDoanhThu);
+		lbTongDoanhThuPhanTich = new JLabel("702,500 VNĐ");
+		lbTongDoanhThuPhanTich.setHorizontalAlignment(SwingConstants.CENTER);
+		lbTongDoanhThuPhanTich.setForeground(new Color(0, 128, 128));
+		lbTongDoanhThuPhanTich.setBounds(10, 71, 283, 80);
+		lbTongDoanhThuPhanTich.setFont(new Font("Tahoma", Font.BOLD, 20));
+		pnl_phanTichDoanhThu.add(lbTongDoanhThuPhanTich);
 		
 		JLabel lbl_leftTienPhong = new JLabel("Tổng tiền phòng");
 		lbl_leftTienPhong.setForeground(new Color(255, 255, 255));
@@ -112,29 +134,29 @@ public class XemThongKe extends JPanel {
 		lbl_leftTienGiamGia.setBounds(10, 285, 127, 28);
 		pnl_pTichTongDoanhThu.add(lbl_leftTienGiamGia);
 		
-		JLabel lbl_rightTienPhong = new JLabel("700,000 VNĐ");
-		lbl_rightTienPhong.setForeground(new Color(255, 255, 255));
-		lbl_rightTienPhong.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lbl_rightTienPhong.setBounds(142, 162, 112, 34);
-		pnl_pTichTongDoanhThu.add(lbl_rightTienPhong);
+		lbTongTienPhongPhanTich = new JLabel("700,000 VNĐ");
+		lbTongTienPhongPhanTich.setForeground(new Color(255, 255, 255));
+		lbTongTienPhongPhanTich.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lbTongTienPhongPhanTich.setBounds(142, 162, 112, 34);
+		pnl_pTichTongDoanhThu.add(lbTongTienPhongPhanTich);
 		
-		JLabel lbl_rightTienDVu = new JLabel("2,500 VNĐ");
-		lbl_rightTienDVu.setForeground(new Color(255, 255, 255));
-		lbl_rightTienDVu.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lbl_rightTienDVu.setBounds(140, 200, 144, 39);
-		pnl_pTichTongDoanhThu.add(lbl_rightTienDVu);
+		lbTongTienDichVuPhanTich = new JLabel("2,500 VNĐ");
+		lbTongTienDichVuPhanTich.setForeground(new Color(255, 255, 255));
+		lbTongTienDichVuPhanTich.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lbTongTienDichVuPhanTich.setBounds(140, 200, 144, 39);
+		pnl_pTichTongDoanhThu.add(lbTongTienDichVuPhanTich);
 		
-		JLabel lbl_rightTienPhuThu = new JLabel("0 VNĐ");
-		lbl_rightTienPhuThu.setForeground(new Color(255, 255, 255));
-		lbl_rightTienPhuThu.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lbl_rightTienPhuThu.setBounds(143, 243, 155, 34);
-		pnl_pTichTongDoanhThu.add(lbl_rightTienPhuThu);
+		lbTongPhuThuPhanTich = new JLabel("0 VNĐ");
+		lbTongPhuThuPhanTich.setForeground(new Color(255, 255, 255));
+		lbTongPhuThuPhanTich.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lbTongPhuThuPhanTich.setBounds(143, 243, 155, 34);
+		pnl_pTichTongDoanhThu.add(lbTongPhuThuPhanTich);
 		
-		JLabel lbl_rightTienGiamGia = new JLabel("0 VNĐ");
-		lbl_rightTienGiamGia.setForeground(new Color(255, 255, 255));
-		lbl_rightTienGiamGia.setBounds(143, 281, 141, 36);
-		pnl_pTichTongDoanhThu.add(lbl_rightTienGiamGia);
-		lbl_rightTienGiamGia.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lbTongGiamGiaThanhToan = new JLabel("0 VNĐ");
+		lbTongGiamGiaThanhToan.setForeground(new Color(255, 255, 255));
+		lbTongGiamGiaThanhToan.setBounds(143, 281, 141, 36);
+		pnl_pTichTongDoanhThu.add(lbTongGiamGiaThanhToan);
+		lbTongGiamGiaThanhToan.setFont(new Font("Tahoma", Font.BOLD, 14));
 		
 		JPanel pnl_frmNhapNgayThang1 = new JPanel();
 		pnl_frmNhapNgayThang1.setBackground(new Color(255, 255, 255));
@@ -144,29 +166,54 @@ public class XemThongKe extends JPanel {
 		
 		JLabel lblNewLabel_13 = new JLabel("Từ ngày");
 		lblNewLabel_13.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNewLabel_13.setBounds(10, 10, 129, 29);
+		lblNewLabel_13.setBounds(10, 63, 77, 29);
 		pnl_frmNhapNgayThang1.add(lblNewLabel_13);
 		
 		JLabel lblNewLabel_14 = new JLabel("Đến ngày");
 		lblNewLabel_14.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNewLabel_14.setBounds(10, 51, 77, 29);
+		lblNewLabel_14.setBounds(10, 104, 77, 29);
 		pnl_frmNhapNgayThang1.add(lblNewLabel_14);
-		
-		textField = new JTextField();
-		textField.setBounds(139, 12, 299, 29);
-		pnl_frmNhapNgayThang1.add(textField);
-		textField.setColumns(10);
-		
-		textField_1 = new JTextField();
-		textField_1.setBounds(139, 49, 299, 29);
-		pnl_frmNhapNgayThang1.add(textField_1);
-		textField_1.setColumns(10);
 		
 		JLabel lblNewLabel_3 = new JLabel("New label");
 		lblNewLabel_3.setBounds(179, 299, 196, 137);
 		pnl_frmNhapNgayThang1.add(lblNewLabel_3);
 		
+		datefromLP = new JDateChooser();
+		datefromLP.getCalendarButton().setHideActionText(true);
+		datefromLP.getCalendarButton().setForeground(UIManager.getColor("InternalFrame.activeTitleBackground"));
+		datefromLP.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
+		datefromLP.getCalendarButton().setBackground((Color) null);
+		datefromLP.setPreferredSize(new Dimension(150, 30));
+		datefromLP.setForeground((Color) null);
+		datefromLP.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		datefromLP.setDateFormatString("dd/MM/yyyy");
+		datefromLP.setBackground((Color) null);
+		datefromLP.setBounds(86, 64, 129, 30);
+		pnl_frmNhapNgayThang1.add(datefromLP);
+		
+		datetoLP = new JDateChooser();
+		datetoLP.getCalendarButton().setHideActionText(true);
+		datetoLP.getCalendarButton().setForeground(UIManager.getColor("InternalFrame.activeTitleBackground"));
+		datetoLP.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
+		datetoLP.getCalendarButton().setBackground((Color) null);
+		datetoLP.setPreferredSize(new Dimension(150, 30));
+		datetoLP.setForeground((Color) null);
+		datetoLP.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		datetoLP.setDateFormatString("dd/MM/yyyy");
+		datetoLP.setBackground((Color) null);
+		datetoLP.setBounds(86, 102, 129, 30);
+		pnl_frmNhapNgayThang1.add(datetoLP);
+		
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(255, 255, 255));
+		panel.setBounds(225, 10, 213, 168);
+		pnl_frmNhapNgayThang1.add(panel);
+		
+		    
+	        
 		JPanel panel_frmNhapNgayThang2 = new JPanel();
+		
+		
 		panel_frmNhapNgayThang2.setBackground(new Color(255, 255, 255));
 		panel_frmNhapNgayThang2.setBounds(468, 145, 447, 188);
 		pnl_xemThongKe.add(panel_frmNhapNgayThang2);
@@ -174,23 +221,47 @@ public class XemThongKe extends JPanel {
 		
 		JLabel lblNewLabel_13_1 = new JLabel("Từ ngày");
 		lblNewLabel_13_1.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNewLabel_13_1.setBounds(10, 10, 129, 29);
+		lblNewLabel_13_1.setBounds(10, 67, 129, 29);
 		panel_frmNhapNgayThang2.add(lblNewLabel_13_1);
 		
 		JLabel lblNewLabel_14_1 = new JLabel("Đến ngày");
 		lblNewLabel_14_1.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNewLabel_14_1.setBounds(10, 52, 77, 29);
+		lblNewLabel_14_1.setBounds(10, 106, 77, 29);
 		panel_frmNhapNgayThang2.add(lblNewLabel_14_1);
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(149, 54, 288, 29);
-		panel_frmNhapNgayThang2.add(textField_2);
+		datefromCTLP = new JDateChooser();
+		datefromCTLP.getCalendarButton().setHideActionText(true);
+		datefromCTLP.getCalendarButton().setForeground(UIManager.getColor("InternalFrame.activeTitleBackground"));
+		datefromCTLP.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
+		datefromCTLP.getCalendarButton().setBackground((Color) null);
+		datefromCTLP.setPreferredSize(new Dimension(150, 30));
+		datefromCTLP.setForeground((Color) null);
+		datefromCTLP.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		datefromCTLP.setDateFormatString("dd/MM/yyyy");
+		datefromCTLP.setBackground((Color) null);
+		datefromCTLP.setBounds(87, 66, 137, 30);
+		panel_frmNhapNgayThang2.add(datefromCTLP);
 		
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
-		textField_3.setBounds(149, 12, 288, 29);
-		panel_frmNhapNgayThang2.add(textField_3);
+		datetoCTLP = new JDateChooser();
+		datetoCTLP.getCalendarButton().setHideActionText(true);
+		datetoCTLP.getCalendarButton().setForeground(UIManager.getColor("InternalFrame.activeTitleBackground"));
+		datetoCTLP.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
+		datetoCTLP.getCalendarButton().setBackground((Color) null);
+		datetoCTLP.setPreferredSize(new Dimension(150, 30));
+		datetoCTLP.setForeground((Color) null);
+		datetoCTLP.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		datetoCTLP.setDateFormatString("dd/MM/yyyy");
+		datetoCTLP.setBackground((Color) null);
+		datetoCTLP.setBounds(87, 105, 137, 30);
+		panel_frmNhapNgayThang2.add(datetoCTLP);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBackground(Color.WHITE);
+		panel_1.setBounds(234, 10, 203, 168);
+		panel_frmNhapNgayThang2.add(panel_1);
+		
+	
+	    // panel_1.add(chartPanelCTLP, BorderLayout.CENTER);
 		
 		JPanel pnl_thongKeNam = new JPanel();
 		pnl_thongKeNam.setBounds(563, 343, 664, 455);
@@ -204,31 +275,33 @@ public class XemThongKe extends JPanel {
 		sl_pnl_thongKeNam.putConstraint(SpringLayout.SOUTH, pnl_chonNam, 45, SpringLayout.NORTH, pnl_thongKeNam);
 		sl_pnl_thongKeNam.putConstraint(SpringLayout.EAST, pnl_chonNam, 664, SpringLayout.WEST, pnl_thongKeNam);
 		pnl_thongKeNam.add(pnl_chonNam);
-		SpringLayout sl_pnl_chonNam = new SpringLayout();
-		pnl_chonNam.setLayout(sl_pnl_chonNam);
+		pnl_chonNam.setLayout(null);
 		
 		JLabel lbl_chonNam = new JLabel("Chọn năm");
-		sl_pnl_chonNam.putConstraint(SpringLayout.NORTH, lbl_chonNam, 12, SpringLayout.NORTH, pnl_chonNam);
-		sl_pnl_chonNam.putConstraint(SpringLayout.WEST, lbl_chonNam, 10, SpringLayout.WEST, pnl_chonNam);
-		sl_pnl_chonNam.putConstraint(SpringLayout.SOUTH, lbl_chonNam, -10, SpringLayout.SOUTH, pnl_chonNam);
-		sl_pnl_chonNam.putConstraint(SpringLayout.EAST, lbl_chonNam, 130, SpringLayout.WEST, pnl_chonNam);
+		lbl_chonNam.setBounds(10, 12, 120, 23);
 		lbl_chonNam.setFont(new Font("Tahoma", Font.BOLD, 14));
 		pnl_chonNam.add(lbl_chonNam);
 		
-		tf_chonNam = new JTextField();
-		sl_pnl_chonNam.putConstraint(SpringLayout.NORTH, tf_chonNam, -2, SpringLayout.NORTH, lbl_chonNam);
-		sl_pnl_chonNam.putConstraint(SpringLayout.WEST, tf_chonNam, 104, SpringLayout.EAST, lbl_chonNam);
-		sl_pnl_chonNam.putConstraint(SpringLayout.SOUTH, tf_chonNam, 0, SpringLayout.SOUTH, lbl_chonNam);
-		sl_pnl_chonNam.putConstraint(SpringLayout.EAST, tf_chonNam, -10, SpringLayout.EAST, pnl_chonNam);
-		pnl_chonNam.add(tf_chonNam);
-		tf_chonNam.setColumns(10);
-		
 		JPanel pnl_bieuDoNam = new JPanel();
 		sl_pnl_thongKeNam.putConstraint(SpringLayout.NORTH, pnl_bieuDoNam, 4, SpringLayout.SOUTH, pnl_chonNam);
+		
+		dateNam = new JDateChooser();
+		dateNam.getCalendarButton().setHideActionText(true);
+		dateNam.getCalendarButton().setForeground(UIManager.getColor("InternalFrame.activeTitleBackground"));
+		dateNam.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
+		dateNam.getCalendarButton().setBackground((Color) null);
+		dateNam.setPreferredSize(new Dimension(150, 30));
+		dateNam.setForeground((Color) null);
+		dateNam.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		dateNam.setDateFormatString("yyyy");
+		dateNam.setBackground((Color) null);
+		dateNam.setBounds(100, 10, 554, 30);
+		pnl_chonNam.add(dateNam);
 		sl_pnl_thongKeNam.putConstraint(SpringLayout.WEST, pnl_bieuDoNam, 0, SpringLayout.WEST, pnl_thongKeNam);
 		sl_pnl_thongKeNam.putConstraint(SpringLayout.SOUTH, pnl_bieuDoNam, -10, SpringLayout.SOUTH, pnl_thongKeNam);
 		sl_pnl_thongKeNam.putConstraint(SpringLayout.EAST, pnl_bieuDoNam, 664, SpringLayout.WEST, pnl_thongKeNam);
 		pnl_thongKeNam.add(pnl_bieuDoNam);
+		pnl_bieuDoNam.setLayout(new BoxLayout(pnl_bieuDoNam, BoxLayout.X_AXIS));
 		
 		JPanel pnl_thongKeThang = new JPanel();
 		pnl_thongKeThang.setBounds(10, 343, 543, 455);
@@ -242,31 +315,35 @@ public class XemThongKe extends JPanel {
 		sl_pnl_thongKeThang.putConstraint(SpringLayout.SOUTH, pnl_chonThang, 46, SpringLayout.NORTH, pnl_thongKeThang);
 		sl_pnl_thongKeThang.putConstraint(SpringLayout.EAST, pnl_chonThang, 543, SpringLayout.WEST, pnl_thongKeThang);
 		pnl_thongKeThang.add(pnl_chonThang);
-		SpringLayout sl_pnl_chonThang = new SpringLayout();
-		pnl_chonThang.setLayout(sl_pnl_chonThang);
+		pnl_chonThang.setLayout(null);
 		
 		JLabel lbl_chonThang = new JLabel("Chọn tháng");
-		sl_pnl_chonThang.putConstraint(SpringLayout.NORTH, lbl_chonThang, 10, SpringLayout.NORTH, pnl_chonThang);
-		sl_pnl_chonThang.putConstraint(SpringLayout.WEST, lbl_chonThang, 10, SpringLayout.WEST, pnl_chonThang);
-		sl_pnl_chonThang.putConstraint(SpringLayout.SOUTH, lbl_chonThang, -10, SpringLayout.SOUTH, pnl_chonThang);
-		sl_pnl_chonThang.putConstraint(SpringLayout.EAST, lbl_chonThang, 105, SpringLayout.WEST, pnl_chonThang);
+		lbl_chonThang.setBounds(10, 10, 95, 26);
 		lbl_chonThang.setFont(new Font("Tahoma", Font.BOLD, 14));
 		pnl_chonThang.add(lbl_chonThang);
 		
-		tf_chonThang = new JTextField();
-		sl_pnl_chonThang.putConstraint(SpringLayout.NORTH, tf_chonThang, 0, SpringLayout.NORTH, lbl_chonThang);
-		sl_pnl_chonThang.putConstraint(SpringLayout.WEST, tf_chonThang, 65, SpringLayout.EAST, lbl_chonThang);
-		sl_pnl_chonThang.putConstraint(SpringLayout.SOUTH, tf_chonThang, 0, SpringLayout.SOUTH, lbl_chonThang);
-		sl_pnl_chonThang.putConstraint(SpringLayout.EAST, tf_chonThang, -10, SpringLayout.EAST, pnl_chonThang);
-		tf_chonThang.setColumns(10);
-		pnl_chonThang.add(tf_chonThang);
+		pnl_bieuDoThang = new JPanel();
 		
-		JPanel pnl_bieuDoThang = new JPanel();
 		sl_pnl_thongKeThang.putConstraint(SpringLayout.NORTH, pnl_bieuDoThang, 6, SpringLayout.SOUTH, pnl_chonThang);
+		
+		dateThang = new JDateChooser();
+		dateThang.setBounds(115, 10, 425, 30);
+		dateThang.getCalendarButton().setHideActionText(true);
+		dateThang.getCalendarButton().setForeground(UIManager.getColor("InternalFrame.activeTitleBackground"));
+		dateThang.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 12));
+		dateThang.getCalendarButton().setBackground((Color) null);
+		dateThang.setPreferredSize(new Dimension(150, 30));
+		dateThang.setForeground((Color) null);
+		dateThang.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		dateThang.setDateFormatString("MM/yyyy");
+		dateThang.setBackground((Color) null);
+		pnl_chonThang.add(dateThang);
 		sl_pnl_thongKeThang.putConstraint(SpringLayout.WEST, pnl_bieuDoThang, 0, SpringLayout.WEST, pnl_thongKeThang);
 		sl_pnl_thongKeThang.putConstraint(SpringLayout.SOUTH, pnl_bieuDoThang, -10, SpringLayout.SOUTH, pnl_thongKeThang);
 		sl_pnl_thongKeThang.putConstraint(SpringLayout.EAST, pnl_bieuDoThang, 0, SpringLayout.EAST, pnl_thongKeThang);
 		pnl_thongKeThang.add(pnl_bieuDoThang);
+		pnl_bieuDoThang.setLayout(new BorderLayout(0, 0));
+	//	pnl_bieuDoThang.add(chartPanel);
 		
 		JPanel pnl_tongDoanhThuPhong = new JPanel();
 		pnl_tongDoanhThuPhong.setBounds(619, 10, 296, 125);
@@ -280,10 +357,10 @@ public class XemThongKe extends JPanel {
 		lbl_tieuDeChinh3.setBounds(20, 10, 333, 31);
 		pnl_tongDoanhThuPhong.add(lbl_tieuDeChinh3);
 		
-		JLabel lbl_tongDoanhThuPhong = new JLabel("702,500 VNĐ");
-		lbl_tongDoanhThuPhong.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lbl_tongDoanhThuPhong.setBounds(20, 51, 226, 39);
-		pnl_tongDoanhThuPhong.add(lbl_tongDoanhThuPhong);
+		lbTongDoanhThuPhong = new JLabel("702,500 VNĐ");
+		lbTongDoanhThuPhong.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lbTongDoanhThuPhong.setBounds(20, 51, 226, 39);
+		pnl_tongDoanhThuPhong.add(lbTongDoanhThuPhong);
 		
 		JLabel lbl_tieuDePhu3 = new JLabel("Doanh thu tháng trước");
 		lbl_tieuDePhu3.setForeground(new Color(128, 0, 0));
@@ -304,10 +381,10 @@ public class XemThongKe extends JPanel {
 		lbl_tieuDeChinh2.setBounds(20, 10, 227, 31);
 		pnl_tongDoanhThuDVu.add(lbl_tieuDeChinh2);
 		
-		JLabel lbl_tongDoanhThuDVu = new JLabel("702,500 VNĐ");
-		lbl_tongDoanhThuDVu.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lbl_tongDoanhThuDVu.setBounds(20, 51, 227, 40);
-		pnl_tongDoanhThuDVu.add(lbl_tongDoanhThuDVu);
+		lbTongDoanhThuDichVu = new JLabel("702,500 VNĐ");
+		lbTongDoanhThuDichVu.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lbTongDoanhThuDichVu.setBounds(20, 51, 227, 40);
+		pnl_tongDoanhThuDVu.add(lbTongDoanhThuDichVu);
 		
 		JLabel lbl_tieuDePhu2 = new JLabel("Doanh thu tháng trước");
 		lbl_tieuDePhu2.setForeground(new Color(128, 0, 0));
@@ -329,17 +406,52 @@ public class XemThongKe extends JPanel {
 						lbl_tieuDeChinh1.setBounds(20, 10, 266, 31);
 						pnl_tongDoanhThu.add(lbl_tieuDeChinh1);
 						
-						JLabel lbl_tongDoanhThu = new JLabel("702,500 VNĐ");
-						lbl_tongDoanhThu.setFont(new Font("Tahoma", Font.PLAIN, 16));
-						lbl_tongDoanhThu.setBounds(20, 51, 266, 35);
-						pnl_tongDoanhThu.add(lbl_tongDoanhThu);
+						lbTongDoanhThu = new JLabel("702,500 VNĐ");
+						lbTongDoanhThu.setFont(new Font("Tahoma", Font.PLAIN, 16));
+						lbTongDoanhThu.setBounds(20, 51, 266, 35);
+						pnl_tongDoanhThu.add(lbTongDoanhThu);
 						
 						JLabel lbl_tieuDePhu_1 = new JLabel("Doanh thu tháng trước");
 						lbl_tieuDePhu_1.setBackground(new Color(255, 0, 0));
 						lbl_tieuDePhu_1.setForeground(new Color(128, 0, 0));
 						lbl_tieuDePhu_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 						lbl_tieuDePhu_1.setBounds(20, 90, 266, 35);
-						pnl_tongDoanhThu.add(lbl_tieuDePhu_1);
+						//Init();
+
+						
 		
 	}
+
+    private void Init()
+    {
+    	DecimalFormat formatter = new DecimalFormat("###,###0 VNĐ");
+        String currentDate = LocalDate.now().toString();
+        
+        // Example usage
+        String tongTienDV = formatter.format(hd.TongTienDV());
+        String tongTienPhong = formatter.format(hd.TongTienPhong());
+        String tongDoanhThu = formatter.format(hd.TongDoanhThu());
+        String tongPhuThu = formatter.format(hd.TongPhuThu());
+        String tongGiamGia = formatter.format(hd.TongGiamGia());
+
+        lbTongDoanhThuDichVu.setText(tongTienDV);
+        lbTongTienDichVuPhanTich.setText(tongTienDV);
+        lbTongDoanhThuPhong.setText(tongTienPhong);
+        lbTongTienPhongPhanTich.setText(tongTienPhong);
+
+        lbTongDoanhThu.setText(tongDoanhThu);
+        lbTongDoanhThuPhanTich.setText(tongDoanhThu);
+
+        lbTongPhuThuPhanTich.setText(tongPhuThu);
+        lbTongGiamGiaThanhToan.setText(tongGiamGia);
+
+        BieuDoPhongLoad BDPPanel = new BieuDoPhongLoad(currentDate, currentDate);
+        BieuDoLoaiPhongLoad BDLPPanel = new BieuDoLoaiPhongLoad(currentDate, currentDate);
+        LocalDate parsedDate = LocalDate.parse(currentDate);
+        int month = parsedDate.getMonthValue();
+        int year = parsedDate.getYear();
+        BieuDoThongKeThangLoad BDTKTPanel = new BieuDoThongKeThangLoad(month, year);
+        BieuDoThongKeNamLoad BDTKNPanel = new BieuDoThongKeNamLoad(year);
+    }
+    
 }

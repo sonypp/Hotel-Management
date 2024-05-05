@@ -19,7 +19,7 @@ public class Database {
 	Statement stmt;
 	PreparedStatement pstmt;
 	ResultSet rs;
-	String serverName = "NORMAN\\NORMAN";
+	String serverName = "VINH\\SQLEXPRESS";
 	String dbName = "QLKSJAVA";
 	public Database() {
 		try {
@@ -27,7 +27,7 @@ public class Database {
 			String url = "jdbc:sqlserver://" + serverName + ":1433;databaseName=" + dbName
 					+ ";encrypt=true;trustServerCertificate=true";
 			String userName = "sa";
-			String password = "123456";
+			String password = "123456789";
 			conn = DriverManager.getConnection(url, userName, password);
 		} catch (Exception e) {
 			e.printStackTrace();
