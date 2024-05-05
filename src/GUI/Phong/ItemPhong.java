@@ -9,6 +9,9 @@ import GUI.QuanLyDatPhong.BookingNew;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -19,6 +22,7 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 
+import BUS.ChiTietThuePhongBUS;
 import BUS.PhongBUS;
 
 public class ItemPhong extends JPanel {
@@ -295,6 +299,13 @@ public class ItemPhong extends JPanel {
 			popupFrame.setSize(1260, 900);
 			popupFrame.getContentPane().add(phieuDatPhong);
 			popupFrame.setLocationRelativeTo(null); // Hiển thị ở giữa màn hình
+			popupFrame.addWindowListener(null);
+			popupFrame.addWindowListener(new WindowAdapter() {
+	            @Override
+	            public void windowClosing(WindowEvent e) {
+	                parent.btnLamMoi.doClick();
+	            }
+	        });
 	    	if(parent.rdbtnTheoNgay.isSelected())
 	    	{
 	    		var date = parent.dateNgayTra.getDate();
@@ -394,6 +405,8 @@ public class ItemPhong extends JPanel {
     private void handleCleanRoom() {
         phongBUS.donPhong(phongDTO.getMaP());
         this.phongDTO.setTinhTrang(0);
+        this.repaint();
+        this.revalidate();
         JOptionPane.showMessageDialog(null, "Dọn phòng này thành công, hiện có thể đặt phòng", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -413,6 +426,26 @@ public class ItemPhong extends JPanel {
 //            	pnTenPhong.setBackground(new Color(0, 130, 0));
             	pnTenPhong.setBackground(new Color(139, 0, 0));
             	panel1_1.setVisible(true);
+            	var cttp = new ChiTietThuePhongBUS();
+            	try {
+            	    String maP = phongDTO.getMaP();
+            	    ResultSet rs = cttp.GetInfoRoom(maP);
+            	    if (rs.next()) {
+            	    	System.out.print("Here");
+            	        txtHoTen.setText(rs.getString(1));
+            	        txtMaPhieuThue.setText(rs.getString(2));
+        	            Date ngayTra = rs.getTimestamp(3);
+        	            if (ngayTra != null) {
+        	                txtNgaytra.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(ngayTra));
+        	            } else {
+        	                txtNgaytra.setText("Chưa xác định");
+        	            }
+            	    }
+            	} catch (Exception e) {
+            	    e.printStackTrace();
+            	}
+
+            	
                 break;
             case 2:
             	pnTenPhong.setBackground(new Color(184, 134, 11));

@@ -15,7 +15,7 @@ public class ChiTietThuePhongDTO {
     public ChiTietThuePhongDTO() {
     }
 
-    public ChiTietThuePhongDTO(String maCTT, String maP, Date ngayThue, Date ngayTra, Date ngayCheckOut, int giaThue, int loaiHinhThue, int tinhTrang) {
+    public ChiTietThuePhongDTO(String maCTT, String maP, Date ngayThue, Date ngayTra, Date ngayCheckOut, int loaiHinhThue, int giaThue, int tinhTrang) {
         this.maCTT = maCTT;
         this.maP = maP;
         this.ngayThue = ngayThue;

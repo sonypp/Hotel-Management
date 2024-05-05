@@ -485,23 +485,53 @@ public class FormSelectRoom extends JPanel {
 	                    List<ChiTietThueDTO> ctThueList = ctt.getDSChiTietThue();
 	                    List<PhongDTO> phongList = phong.getListPhong_DTO();
 
+//	                    List<PhongDTO> cttFiltered = new ArrayList<>();
+//	                    for (ChiTietThuePhongDTO cttp : cttList) {
+//	                        for (ChiTietThueDTO ct : ctThueList) {
+//	                        	if (ct != null && cttp != null)
+//	                        	{
+//		                            if (cttp.getMaCTT().equals(ct.getMaCTT()) && cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
+//		                                    && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)) {
+//		                                cttFiltered.add(phongList.stream()
+//		                                        .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0
+//		                                                && !cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
+//		                                        .findFirst().orElse(null));
+//		                            }
+//	                        	}
+//	                        }
+//	                    }
 	                    List<PhongDTO> cttFiltered = new ArrayList<>();
-	                    for (ChiTietThuePhongDTO cttp : cttList) {
-	                        for (ChiTietThueDTO ct : ctThueList) {
-	                            if (cttp.getMaCTT().equals(ct.getMaCTT()) && cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
-	                                    && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)) {
-	                                cttFiltered.add(phongList.stream()
-	                                        .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0
-	                                                && !cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
-	                                        .findFirst().orElse(null));
-	                            }
-	                        }
-	                    }
+				        for (ChiTietThuePhongDTO cttp : cttList) {
+				            for (ChiTietThueDTO ctt1 : ctThueList) {
+				                if (cttp.getMaCTT().equals(ctt1.getMaCTT())) {
+				                	if(cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0) {
+					                    if (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null) {
+						                    cttFiltered.add(phongList.stream()
+						                            .filter(room -> (cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0)
+						                            		|| cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
+						                            .findFirst().orElse(null));
+					                    }
+				                    }
+				                }
+				            }
+				        }
 
-	                    List<PhongDTO> roomsValid = phongList.stream()
-	                            .filter(room -> room.getTinhTrang() == 0)
-	                            .filter(room -> cttFiltered.stream().noneMatch(ct -> ct.getMaP().equals(room.getMaP())))
-	                            .collect(Collectors.toList());
+				        List<PhongDTO> roomsValid = new ArrayList<>();
+				        for (PhongDTO room : phongList) {
+				            if (room.getTinhTrang() == 0) {
+				                boolean isRoomValid = true;
+				                for (PhongDTO ct : cttFiltered) {
+				                	if (ct == null) continue;
+				                    if (ct.getMaP().equals(room.getMaP())) {
+				                        isRoomValid = false;
+				                        break;
+				                    }
+				                }
+				                if (isRoomValid) {
+				                    roomsValid.add(room);
+				                }
+				            }
+				        }
 
 	                    listPhong.clear();
 	                    listPhong.addAll(roomsValid);
@@ -531,22 +561,38 @@ public class FormSelectRoom extends JPanel {
 	                        List<PhongDTO> phongList = phong.getListPhong_DTO();
 
 	                        List<PhongDTO> cttFiltered = new ArrayList<>();
-	                        for (ChiTietThuePhongDTO cttp : cttList) {
-	                            for (ChiTietThueDTO ct : ctThueList) {
-	                                if (cttp.getMaCTT().equals(ct.getMaCTT()) && cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0
-	                                        && (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null)) {
-	                                    cttFiltered.add(phongList.stream()
-	                                            .filter(room -> cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0
-	                                                    && !cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
-	                                            .findFirst().orElse(null));
-	                                }
-	                            }
-	                        }
-
-	                        List<PhongDTO> roomsValid = phongList.stream()
-	                                .filter(room -> room.getTinhTrang() == 0)
-	                                .filter(room -> cttFiltered.stream().noneMatch(ct -> ct.getMaP().equals(room.getMaP())))
-	                                .collect(Collectors.toList());
+					        for (ChiTietThuePhongDTO cttp : cttList) {
+					            for (ChiTietThueDTO ctt1 : ctThueList) {
+					                if (cttp.getMaCTT().equals(ctt1.getMaCTT())) {
+					                	if(cttp.getNgayThue().compareTo(dateNgayTra.getDate()) <= 0) {
+						                    if (cttp.getNgayTra().compareTo(dateNgayThue.getDate()) >= 0 || cttp.getNgayTra() == null) {
+							                    cttFiltered.add(phongList.stream()
+							                            .filter(room -> (cttp.getMaP().equals(room.getMaP()) && room.getTinhTrang() == 0)
+							                            		|| cttList.stream().anyMatch(cttp1 -> cttp1.getMaP().equals(room.getMaP())))
+							                            .findFirst().orElse(null));
+						                    }
+					                    }
+					                }
+					            }
+					        }
+	                        
+					        List<PhongDTO> roomsValid = new ArrayList<>();
+					        for (PhongDTO room : phongList) {
+					            if (room.getTinhTrang() == 0) {
+					                boolean isRoomValid = true;
+					                for (PhongDTO ct : cttFiltered) {
+					                	if (ct == null) continue;
+					                    if (ct.getMaP().equals(room.getMaP())) {
+					                        isRoomValid = false;
+					                        break;
+					                    }
+					                }
+					                if (isRoomValid) {
+					                    roomsValid.add(room);
+					                }
+					            }
+					        }
+	                        
 
 	                        listPhong.clear();
 	                        listPhong.addAll(roomsValid);
@@ -584,10 +630,22 @@ public class FormSelectRoom extends JPanel {
 	                        .map(arr -> (PhongDTO) arr[2])
 	                        .collect(Collectors.toList());
 
-	                List<PhongDTO> roomsValid = phongList.stream()
-	                        .filter(room -> room.getTinhTrang() == 0)
-	                        .filter(room -> cttFiltered.stream().noneMatch(ct -> ct.getMaP().equals(room.getMaP())))
-	                        .collect(Collectors.toList());
+	                List<PhongDTO> roomsValid = new ArrayList<>();
+			        for (PhongDTO room : phongList) {
+			            if (room.getTinhTrang() == 0) {
+			                boolean isRoomValid = true;
+			                for (PhongDTO ct : cttFiltered) {
+			                	if (ct == null) continue;
+			                    if (ct.getMaP().equals(room.getMaP())) {
+			                        isRoomValid = false;
+			                        break;
+			                    }
+			                }
+			                if (isRoomValid) {
+			                    roomsValid.add(room);
+			                }
+			            }
+			        }
 
 	                listPhong.clear();
 	                listPhong.addAll(roomsValid);

@@ -259,7 +259,8 @@ public class PanelPosition extends JPanel {
 				                        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 				                        JLabel lblTaiKhoan = new JLabel("Tài khoản: ");
 				                        panel.add(lblTaiKhoan);
-				                        panel.add(txtTK);				                        JLabel lblPhanQuyen = new JLabel("Phân quyền: ");
+				                        panel.add(txtTK);
+				                        JLabel lblPhanQuyen = new JLabel("Phân quyền: ");
 				                        panel.add(lblPhanQuyen);
 				                        cbBoxViTri.setSelectedItem(pq);
 				                        panel.add(cbBoxViTri);
@@ -633,12 +634,6 @@ public class PanelPosition extends JPanel {
     
 	        }
 	        var taoCell = new ButtonRenderer();
-	        taoCell.addActionListener(new ActionListener() {
-    			public void actionPerformed(ActionEvent e) {
-    				System.out.print("Here");
-    			}
-    		}
-    		);
 	        tableDSNV.getColumnModel().getColumn(6).setCellRenderer(taoCell);
             tableDSNV.getColumnModel().getColumn(7).setCellRenderer(new ButtonRenderer());
             tableDSNV.getColumnModel().getColumn(8).setCellRenderer(new ButtonRenderer());

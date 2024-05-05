@@ -18,6 +18,7 @@ import GUI.Home.HomeForm;
 import java.awt.*;
 import java.awt.Font;
 import java.awt.event.*;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
@@ -71,7 +72,7 @@ public class ThanhToan extends JFrame {
 
     public ThanhToan(String maCTT) {
         setBackground(Color.WHITE);
-        setBounds(100, 100, 1200, 700);
+        setBounds(100, 100, 1220, 740);
         getContentPane().setLayout(null);
 
         // Panel 1
@@ -254,7 +255,7 @@ public class ThanhToan extends JFrame {
         tableLayoutPanel5.add(panel12);
         JPanel panel11 = new JPanel();
         panel11.setLayout(new BorderLayout());
-        CbPhuThu = new JComboBox<>(new String[]{"0%", "5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%"});
+        CbPhuThu = new JComboBox<>(new String[]{"", "0%", "5%", "10%", "15%", "20%", "25%", "30%", "35%", "40%", "45%", "50%", "55%", "60%", "65%", "70%", "75%", "80%", "85%", "90%", "95%", "100%"});
         CbPhuThu.addItemListener(new ItemListener() {
         	public void itemStateChanged(ItemEvent e) {
         		CbPhuThu_SelectedIndexChanged();
@@ -583,9 +584,10 @@ public class ThanhToan extends JFrame {
         try {
             PdfWriter.getInstance(document, new FileOutputStream(maHD + ".pdf"));
             document.open();
-            // Font setup
-            com.itextpdf.text.Font fontTitle = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, 13, com.itextpdf.text.Font.BOLD | com.itextpdf.text.Font.UNDERLINE);
-            com.itextpdf.text.Font font = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, 12, com.itextpdf.text.Font.NORMAL);
+            String fontPath = "fonts/ARIAL.TTF"; // Đường dẫn đến tệp font trong thư mục dự án của bạn
+	        BaseFont bf = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+	        com.itextpdf.text.Font font = new com.itextpdf.text.Font(bf, 12, com.itextpdf.text.Font.NORMAL, BaseColor.BLACK);
+	        com.itextpdf.text.Font fontTitle = new com.itextpdf.text.Font(bf, 13, com.itextpdf.text.Font.BOLD | com.itextpdf.text.Font.UNDERLINE, BaseColor.GRAY);
 
             // Title
             Paragraph p = new Paragraph("KHÁCH SẠN LUXURY", fontTitle);
@@ -762,6 +764,12 @@ public class ThanhToan extends JFrame {
             // Add the table to the document
             document.add(table1);
             document.close();
+            File pdfFile = new File(maHD + ".pdf");
+            if (pdfFile.exists()) {
+                Desktop.getDesktop().open(pdfFile);
+            } else {
+                System.out.println("PDF file not found: " + maHD + ".pdf");
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -808,8 +816,7 @@ public class ThanhToan extends JFrame {
 
                 String GiamGia = txtGiamGia.getText().replace("%", "");
                 String phuThu = CbPhuThu.getSelectedItem().toString().replace("%", "");
-                String ngayThanhToan = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-                hd.ThemHoaDon(maHD, maCTT, GiamGia, phuThu, ngayThanhToan, cbPTTT.getSelectedIndex() + "");
+                hd.ThemHoaDon(maHD, maCTT, Integer.valueOf(GiamGia), Integer.valueOf(phuThu), new Date(), cbPTTT.getSelectedIndex());
 
                 // Sửa tình trạng xử lý của phiếu thuê
                 ChiTietThueBUS ctt = new ChiTietThueBUS();
@@ -825,6 +832,7 @@ public class ThanhToan extends JFrame {
                 }
 
                 XuatFilePDF(maHD);
+                
                 JOptionPane.showMessageDialog(null, "Thêm hóa đơn mới thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
             } catch (Exception ex) {

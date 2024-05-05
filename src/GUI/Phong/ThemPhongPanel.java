@@ -560,7 +560,6 @@ public class ThemPhongPanel extends JPanel {
 						tbTienIchPhong.getValueAt(row, 3).toString());
 					}
 					for (int i = 0; i < temp.size(); i++) {
-						System.out.print("Here");
 						tienichBUS.XoaTienIchPhong(maPhong, temp.get(i));
 					}
 					QLPHONGPanel.DisposeFrame();

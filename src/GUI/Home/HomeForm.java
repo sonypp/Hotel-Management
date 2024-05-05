@@ -62,6 +62,8 @@ import java.awt.FlowLayout;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import java.awt.SystemColor;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class HomeForm extends JFrame {
 	
@@ -105,6 +107,7 @@ public class HomeForm extends JFrame {
 
 	
 	public HomeForm() {
+		
 		setBackground(new Color(255, 255, 255));
 		setFont(new Font("Dialog", Font.BOLD, 24));
 		setTitle("PHẦN MỀM QUẢN LÝ KHÁCH SẠN ");

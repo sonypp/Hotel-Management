@@ -19,6 +19,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +32,13 @@ import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 import BUS.ChiTietThueDichVuBUS;
 import BUS.ChiTietThuePhongBUS;
@@ -39,9 +48,9 @@ import DTO.ChiTietThueDichVuDTO;
 import DTO.ChiTietThuePhongDTO;
 import DTO.DichVuDTO;
 import DTO.PhongDTO;
+import javax.swing.ScrollPaneConstants;
 
 public class FormChiTietPhieuThue extends JPanel {
-
 	private JPanel panel_1;
 	private JTable tableRoom;
 	private JTable tableService;
@@ -71,18 +80,10 @@ public class FormChiTietPhieuThue extends JPanel {
 		hienThiChiTietThueDichVu();
 		if (option == 0) {
 		    btnThanhToan.setVisible(true);
-		    tableRoom.getColumnModel().getColumn(9).setPreferredWidth(0);
-		    tableRoom.getColumnModel().getColumn(9).setMinWidth(0);
-		    tableRoom.getColumnModel().getColumn(9).setMaxWidth(0);
-		    tableRoom.getColumnModel().getColumn(10).setPreferredWidth(0);
-		    tableRoom.getColumnModel().getColumn(10).setMinWidth(0);
-		    tableRoom.getColumnModel().getColumn(10).setMaxWidth(0);
-		    tableService.getColumnModel().getColumn(7).setPreferredWidth(0);
-		    tableService.getColumnModel().getColumn(7).setMinWidth(0);
-		    tableService.getColumnModel().getColumn(7).setMaxWidth(0);
-		    tableService.getColumnModel().getColumn(8).setPreferredWidth(0);
-		    tableService.getColumnModel().getColumn(8).setMinWidth(0);
-		    tableService.getColumnModel().getColumn(8).setMaxWidth(0);
+		    tableRoom.getColumnModel().getColumn(9).setPreferredWidth(30);
+		    tableRoom.getColumnModel().getColumn(10).setPreferredWidth(30);
+		    tableService.getColumnModel().getColumn(7).setPreferredWidth(30);
+		    tableService.getColumnModel().getColumn(8).setPreferredWidth(30);
 		} else {
 		    btnThanhToan.setVisible(false);
 		    tableRoom.getColumnModel().getColumn(9).setPreferredWidth(0);
@@ -150,7 +151,7 @@ public class FormChiTietPhieuThue extends JPanel {
 	                String ngayTra = cttp.getNgayTra() != null ? dateFormat.format(cttp.getNgayTra()) : "";
 	                String ngayCheckOut = cttp.getNgayCheckOut() != null ? dateFormat.format(cttp.getNgayCheckOut()) : "";
 	                String giaThue = String.format("%,d VNĐ", cttp.getGiaThue());
-	                model.addRow(new Object[] { ++stt, cttp.getMaP(), phong.getTenP(), tinhTrang, loaiHinhThue, dateFormat.format(cttp.getNgayThue()), ngayTra, ngayCheckOut, giaThue });
+	                model.addRow(new Object[] { ++stt, cttp.getMaP(), phong.getTenP(), tinhTrang, loaiHinhThue, dateFormat.format(cttp.getNgayThue()), ngayTra, ngayCheckOut, giaThue});
 	                break; // Stop looping through phongs for this cttp
 	            }
 	        }
@@ -169,8 +170,8 @@ public class FormChiTietPhieuThue extends JPanel {
 	    for (ChiTietThueDichVuDTO cttdv : cttdvs) {
 	        for (DichVuDTO dv : dvs) {
 	            if (cttdv.getMaDV().equals(dv.getMaDV())) {
-	                double thanhTien = cttdv.getGiaDV() * cttdv.getSoLuong();
-	                model.addRow(new Object[] { ++stt, cttdv.getMaDV(), dv.getTenDV(), dateFormat.format(cttdv.getNgaySuDung()), cttdv.getSoLuong(), String.format("%,d VNĐ", cttdv.getGiaDV()), String.format("%,d VNĐ", thanhTien) });
+	                int thanhTien = cttdv.getGiaDV() * cttdv.getSoLuong();
+	                model.addRow(new Object[] { ++stt, cttdv.getMaDV(), dv.getTenDV(), dateFormat.format(cttdv.getNgaySuDung()), cttdv.getSoLuong(), String.format("%,d VNĐ", cttdv.getGiaDV()), String.format("%,d VNĐ", thanhTien)});
 	                break; // Stop looping through dvs for this cttdv
 	            }
 	        }
@@ -216,8 +217,36 @@ public class FormChiTietPhieuThue extends JPanel {
 	                if (!tableRoom.getValueAt(selectedRowIndex, 4).toString().equals("Khác")) {
 	                    cttP.UpdateCheckOut(true, maCTT, maP, ngayThueFormatted, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), "0");
 	                } else {
-	                    // Calculate gia here
-	                    // ...
+	                	var cttp = new ChiTietThuePhongBUS();
+	                    var cttpList = cttp.GetDSListCTTP(maCTT);
+	                    ChiTietThuePhongDTO cttpDTO = new ChiTietThuePhongDTO();
+	                    for(var ctt : cttpList)
+	                    {
+	                    	if(ctt.getMaP() == maP && ctt.getNgayThue().compareTo(ngayThueDate) == 0)
+	                    	{
+	                    		cttpDTO = ctt;
+	                    		return;
+	                    	}
+	                    }
+	                    Date ngayTraDate = new Date();
+	                    LocalDateTime ngayThueLocal = ngayThueDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    	    		LocalDateTime ngayTraLocal = ngayTraDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    	    		var duration = Duration.between(ngayTraLocal, ngayThueLocal);
+	    	    		var day = Math.abs(duration.toDays());
+	    	    		var hours = Math.abs(duration.toHours());
+	    	    		double tmp = 0;
+	    	    		switch ((int)hours)
+	    	    		{
+	    		    		case 1:
+	    		    			tmp = cttpDTO.getGiaThue() * 0.2 + cttpDTO.getGiaThue() * day;
+	    		    			break;
+	    		    		case 2:
+	    		    			tmp = cttpDTO.getGiaThue() * 0.1 + cttpDTO.getGiaThue() * day;
+	    		    			break;
+	    		    		default:
+	    		    			tmp = cttpDTO.getGiaThue() * 0.05 + cttpDTO.getGiaThue() * day;
+	    		    			break;
+	    	    		}
 	                }
 	                phong.SuaTinhTrang(maP, "2");
 	                JOptionPane.showMessageDialog(null, "Trả phòng cho khách thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
@@ -291,14 +320,24 @@ public class FormChiTietPhieuThue extends JPanel {
 	    if (tableService.getSelectedColumn() == indexUpdate && tableService.getSelectedRow() >= 0) {
 	        formInput frmInput = new formInput();
 	        frmInput.setVisible(true);
-	        if (frmInput.getDialogResult() == JOptionPane.YES_OPTION) {
-	            int soLuong = frmInput.getNumber();
-	            cttDV.SuaSoLuongCTTDV(maCTT, tbService.getValueAt(tableService.getSelectedRow(), 1).toString(), tbService.getValueAt(tableService.getSelectedRow(), 3).toString(), Integer.toString(soLuong));
-	            hienThiChiTietThueDichVu();
-	            JOptionPane.showMessageDialog(null, "Sửa dịch vụ này thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-	        } else {
-	            tableService.clearSelection();
-	        }
+	        new Timer(100, new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                if (frmInput.getDialogResult() == JOptionPane.YES_OPTION) {
+	                    int soLuong = frmInput.getNumber();
+	                    cttDV.SuaSoLuongCTTDV(maCTT, tbService.getValueAt(tableService.getSelectedRow(), 1).toString(), tbService.getValueAt(tableService.getSelectedRow(), 3).toString(), Integer.toString(soLuong));
+	                    hienThiChiTietThueDichVu();
+	                    JOptionPane.showMessageDialog(null, "Sửa dịch vụ này thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+	                    var source = (Timer)e.getSource();
+	                    source.stop();
+	                } else if (frmInput.getDialogResult() == JOptionPane.CANCEL_OPTION) {
+	                    tableService.clearSelection();
+	                    var source = (Timer)e.getSource();
+	                    source.stop();
+	                }
+	            }
+	        }).start();
+
 	    }
 	}
 
@@ -307,26 +346,57 @@ public class FormChiTietPhieuThue extends JPanel {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		setBounds(0, 0, 920, 815);
+		setLayout(null);
 		panel_1 = new JPanel();
 		panel_1.setLayout(null);
-		panel_1.setBounds(411, 27, 830, 798);
+		panel_1.setBounds(0, 0, 920, 815);
+		add(panel_1);
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setLayout(null);
-		panel_2.setBounds(10, 5, 810, 363);
+		panel_2.setBounds(10, 5, 900, 340);
 		panel_1.add(panel_2);
 		
 		JLabel lblNewLabel = new JLabel("Danh sách phòng khách thuê");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblNewLabel.setBounds(10, 10, 267, 33);
+		lblNewLabel.setBounds(10, 10, 890, 33);
 		panel_2.add(lblNewLabel);
 		
 		JScrollPane scrpDSPhongKhachThue = new JScrollPane();
-		scrpDSPhongKhachThue.setBounds(10, 50, 790, 303);
+		scrpDSPhongKhachThue.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrpDSPhongKhachThue.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrpDSPhongKhachThue.setBounds(10, 50, 890, 280);
 		panel_2.add(scrpDSPhongKhachThue);
 		
-		tableRoom = new JTable();
-		tableRoom.setBounds(0, 0, 788, 1);
+		var tableRoomColumn = new String[] {
+				"STT", "MÃ PHÒNG", "TÊN PHÒNG", "TÌNH TRẠNG", "LOẠI HÌNH THUÊ", "NGÀY THUÊ", "NGÀY TRẢ", "NGÀY CHECKOUT", "GIÁ PHÒNG", "SỬA", "XÓA"
+			};
+        String data[][] = {};
+        tbRoom = new DefaultTableModel(data, tableRoomColumn);
+        tableRoom = new JTable(tbRoom);
+        tableRoom.setRowHeight(30);
+        
+        // Customize the table header
+        JTableHeader tableHeader = tableRoom.getTableHeader();
+        tableHeader.setPreferredSize(new Dimension(tableHeader.getWidth(), 30));
+        tableHeader.setBackground(Color.MAGENTA);
+        tableHeader.setForeground(Color.WHITE);
+        tableHeader.setReorderingAllowed(false);
+        
+        // Set font style and alignment for column headers
+        Font headerFont = new Font("Arial", Font.BOLD, 14);
+        tableHeader.setFont(headerFont);
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) tableRoom.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        headerRenderer.setVerticalAlignment(SwingConstants.CENTER);
+        headerRenderer.setText("<html><font color='white'>Name</font></html>"); // Change 'Name' to your column header text
+
+        // Customize other properties of the table
+        tableRoom.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        tableRoom.setShowGrid(false);
+        tableRoom.setDefaultEditor(Object.class, null);
+        scrpDSPhongKhachThue.setViewportView(tableRoom);
 		tableRoom.addMouseListener(new MouseAdapter() {
 	        @Override
 	        public void mouseClicked(MouseEvent e) {
@@ -338,14 +408,17 @@ public class FormChiTietPhieuThue extends JPanel {
 	                int ans = JOptionPane.showConfirmDialog(null, "Bạn có muốn xóa phòng thuê này", "Cảnh báo", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 	                if (ans == JOptionPane.YES_OPTION) {
 	                    if (tableRoom.getValueAt(row, 3).toString().equals("Đang xử lý")) {
-	                        cttP.DeleteCTTP(maCTT, tableRoom.getValueAt(row, 1).toString(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(tableRoom.getValueAt(row, 5)));
+	                        try {
+								cttP.DeleteCTTP(maCTT, tableRoom.getValueAt(row, 1).toString(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new SimpleDateFormat("dd/mm/yyyy HH:mm:ss").parse(tableRoom.getValueAt(row, 5).toString())));
+							} catch (ParseException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 	                        JOptionPane.showMessageDialog(null, "Xóa phòng này thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
 	                        hienThiChiTietThuePhong();
 	                    } else {
 	                        JOptionPane.showMessageDialog(null, "Phòng này " + tableRoom.getValueAt(row, 3).toString() + " không thể xóa", "Thông báo", JOptionPane.ERROR_MESSAGE);
 	                    }
-	                } else {
-	                    ((DefaultTableModel) tableRoom.getModel()).removeRow(row);
 	                }
 	            }
 	            int indexUpdate = 9;
@@ -354,24 +427,49 @@ public class FormChiTietPhieuThue extends JPanel {
 	            }
 	        }
 	    });
-		scrpDSPhongKhachThue.add(tableRoom);
 		
 		JPanel panel_2_1 = new JPanel();
 		panel_2_1.setLayout(null);
-		panel_2_1.setBounds(10, 382, 810, 363);
+		panel_2_1.setBounds(10, 355, 900, 340);
 		panel_1.add(panel_2_1);
 		
 		JLabel lblDanhSchDch = new JLabel("Danh sách dịch vụ khách thuê");
 		lblDanhSchDch.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblDanhSchDch.setBounds(10, 10, 267, 33);
+		lblDanhSchDch.setBounds(10, 10, 890, 33);
 		panel_2_1.add(lblDanhSchDch);
 		
 		JScrollPane scrpDanhSachDichVuKhachThue = new JScrollPane();
-		scrpDanhSachDichVuKhachThue.setBounds(10, 50, 790, 303);
+		scrpDanhSachDichVuKhachThue.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrpDanhSachDichVuKhachThue.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrpDanhSachDichVuKhachThue.setBounds(10, 50, 890, 280);
 		panel_2_1.add(scrpDanhSachDichVuKhachThue);
 		
-		tableService = new JTable();
-		tableService.setBounds(0, 0, 788, 1);
+		var tableServiceColumn = new String[] {
+				"STT", "MÃ DỊCH VỤ", "TÊN DỊCH VỤ", "NGÀY SỬ DỤNG", "SỐ LƯỢNG", "ĐƠN GIÁ", "THÀNH TIỀN", "SỬA", "XÓA"
+			};
+        tbService = new DefaultTableModel(data, tableServiceColumn);
+        tableService = new JTable(tbService);
+        tableService.setRowHeight(30);
+        
+        // Customize the table header
+        JTableHeader tableHeader1 = tableService.getTableHeader();
+        tableHeader1.setPreferredSize(new Dimension(tableHeader1.getWidth(), 30));
+        tableHeader1.setBackground(Color.MAGENTA);
+        tableHeader1.setForeground(Color.WHITE);
+        tableHeader1.setReorderingAllowed(false);
+        
+        // Set font style and alignment for column headers
+        Font headerFont1 = new Font("Arial", Font.BOLD, 14);
+        tableHeader1.setFont(headerFont1);
+        DefaultTableCellRenderer headerRenderer1 = (DefaultTableCellRenderer) tableService.getTableHeader().getDefaultRenderer();
+        headerRenderer1.setHorizontalAlignment(SwingConstants.CENTER);
+        headerRenderer1.setVerticalAlignment(SwingConstants.CENTER);
+        headerRenderer1.setText("<html><font color='white'>Name</font></html>"); // Change 'Name' to your column header text
+
+        // Customize other properties of the table
+        tableService.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        tableService.setShowGrid(false);
+        tableService.setDefaultEditor(Object.class, null);
 		tableService.addMouseListener(new MouseInputAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -379,11 +477,12 @@ public class FormChiTietPhieuThue extends JPanel {
             }
         });
 		scrpDanhSachDichVuKhachThue.add(tableService);
+		scrpDanhSachDichVuKhachThue.setViewportView(tableService);
 		
 		lbTotal = new JLabel("New label");
 		lbTotal.setForeground(Color.RED);
 		lbTotal.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 16));
-		lbTotal.setBounds(325, 755, 142, 33);
+		lbTotal.setBounds(363, 705, 142, 33);
 		panel_1.add(lbTotal);
 		
 		btnThanhToan = new JButton("Thanh Toán");
@@ -395,13 +494,13 @@ public class FormChiTietPhieuThue extends JPanel {
 		});
 		btnThanhToan.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnThanhToan.setBackground(new Color(87, 87, 255));
-		btnThanhToan.setBounds(441, 755, 186, 33);
+		btnThanhToan.setBounds(532, 705, 186, 33);
 		panel_1.add(btnThanhToan);
 		
 		btnPrint = new JButton("In Phiếu Thuê");
 		btnPrint.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnPrint.setBackground(new Color(87, 87, 255));
-		btnPrint.setBounds(637, 755, 167, 33);
+		btnPrint.setBounds(728, 705, 167, 33);
 		panel_1.add(btnPrint);
 		
 		// Create font for menu items

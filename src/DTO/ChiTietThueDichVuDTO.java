@@ -12,7 +12,7 @@ public class ChiTietThueDichVuDTO {
     public ChiTietThueDichVuDTO() {
     }
 
-    public ChiTietThueDichVuDTO(String maCTT, String maDV, Date ngaySuDung, int giaDV, int soLuong) {
+    public ChiTietThueDichVuDTO(String maCTT, String maDV, Date ngaySuDung, int soLuong, int giaDV) {
         this.maCTT = maCTT;
         this.maDV = maDV;
         this.ngaySuDung = ngaySuDung;

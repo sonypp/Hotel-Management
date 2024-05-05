@@ -267,12 +267,11 @@ public class HoaDonBUS {
 	
 	public ResultSet getHoaDon(String maHD)
 	{
-	    String query = "SELECT HoaDon.maHD, HoaDon.maCTT, NhanVien.tenNV, HoaDon.ngayThanhToan\r\n"
-	    		+ "FROM HoaDon\r\n"
-	    		+ "JOIN NhanVien ON HoaDon.maNV = NhanVien.maNV\r\n"
-	    		+ "JOIN ChiTietThue ON HoaDon.maCTT = ChiTietThue.maCTT\r\n"
-	    		+ "WHERE HoaDon.maHD = '\"" + maHD + "\'\r\n"
-	    		+ "";
+		String query = "SELECT HoaDon.maHD, HoaDon.maCTT, NhanVien.tenNV, HoaDon.ngayThanhToan " +
+	               "FROM HoaDon " +
+	               "JOIN ChiTietThue ON HoaDon.maCTT = ChiTietThue.maCTT " +
+	               "JOIN NhanVien ON ChiTietThue.maNV = NhanVien.maNV " +
+	               "WHERE HoaDon.maHD = '" + maHD + "'";
 	    return db.getList(query);
 	}
 	
@@ -287,10 +286,10 @@ public class HoaDonBUS {
 	    return db.getList(query);
 	}
 	
-	public void ThemHoaDon(String maHD, String maCTT, String giamGia, String phuThu, String ngayThanhToan, String pttt)
+	public void ThemHoaDon(String maHD, String maCTT, int giamGia, int phuThu, Date ngayThanhToan, int pttt)
 	{
-	    String query = String.format("insert into HOADON values('{0}','{1}',{2},{3},'{4}',{5},0)", maHD, maCTT, giamGia, phuThu, ngayThanhToan, pttt);
-	    db.executeNonQuery(query);
+	    String query = "insert into HOADON values(?,?, ?, ?, ?, ?, 0)";
+	    db.executeNonQuery(query, new Object[] {maHD, maCTT, giamGia, phuThu, ngayThanhToan, pttt});
 	}
 	
 	public int SoLuongHD(String dateNow)
