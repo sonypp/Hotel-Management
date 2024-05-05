@@ -1,6 +1,8 @@
 package BUS;
 
 import DAO.Database;
+import DTO.TaiKhoanDTO;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -21,7 +23,7 @@ public class PhanQuyenBUS {
         db.executeNonQuery(query);
     }
     public void suaPQcuaNV(String maNV, int chucVu) throws SQLException {
-        String query = "UPDATE NHANVIEN SET chucVu = ? WHERE maNV = ?";
+        String query = "UPDATE TAIKHOAN SET maPQ = ? WHERE maNV = ?";
         Object[] param = {chucVu, maNV};
         db.executeNonQuery(query, param);
     }
@@ -60,6 +62,8 @@ public class PhanQuyenBUS {
         db.executeNonQuery(query, params);
     }
 
-
-
+	public int getPQ(String maNV) {
+		var query = "SELECT maPQ FROM TAIKHOAN JOIN NHANVIEN ON TAIKHOAN.maNV = NHANVIEN.maNV WHERE NHANVIEN.maNV = '" + maNV +"';";
+		return db.executeNonQueryGetInteger(query);
+	}
 }

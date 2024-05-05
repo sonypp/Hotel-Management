@@ -20,6 +20,7 @@ import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import com.toedter.calendar.JCalendar;
 
 import BUS.ChucNangBUS;
+import BUS.PhanQuyenBUS;
 import DTO.NhanVienDTO;
 
 import javax.swing.border.CompoundBorder;
@@ -642,9 +643,9 @@ public class HomeForm extends JFrame {
 		
 			
 		if (nhanVien != null) {
-		    int chucVu = nhanVien.getChucVu();
-		    String strchucVu = String.valueOf(chucVu);
-		    ResultSet ChucNang = cnBUS.QuyenQuanLy(strchucVu);
+			var pqBUS = new PhanQuyenBUS();
+			var mapq = pqBUS.getPQ(nhanVien.getMaNV());
+		    ResultSet ChucNang = cnBUS.QuyenQuanLy(String.valueOf(mapq));
 		    panelMenu.add(Box.createVerticalStrut(10));
 		    
 		    try {
@@ -706,7 +707,7 @@ public class HomeForm extends JFrame {
 		    	// TODO Auto-generated catch block
 		    	e1.printStackTrace();
 		    }
-		    ResultSet tenChucVu = cnBUS.getTenPQ(strchucVu);
+		    ResultSet tenChucVu = cnBUS.getTenPQ(String.valueOf(mapq));
 		    String ten = nhanVien.getTenNV();
 		    try {
 				if (tenChucVu.next()) {

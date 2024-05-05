@@ -189,12 +189,19 @@ public class PanelPosition extends JPanel {
 		    				    	String newTaiKhoan = JOptionPane.showInputDialog(null, "Nhập tài khoản mới\nMã nhân viên: " + maNV + "\nTên nhân viên: " + tenNV + "\nThêm tài khoản", JOptionPane.PLAIN_MESSAGE);
 		    				    	if (newTaiKhoan != null && !newTaiKhoan.isEmpty()) 
 		    				    	{
-		    				    		
-		    				    		tkBUS.TaoTaiKhoan(newTaiKhoan, maNV, maNV, 0, 0);
-		    				    		DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
-		    				    		TT = "Đâ cấp tài khoản";
-		    	                        model.setValueAt(newTaiKhoan, row, 4);
-		    	                        model.setValueAt(TT, row, 5);
+		    				    		var check = tkBUS.GetTK(newTaiKhoan);
+		    				    		if(check.getMaNV() == null)
+		    				    		{
+			    				    		tkBUS.TaoTaiKhoan(newTaiKhoan, maNV, maNV, 0, 0);
+			    				    		DefaultTableModel model = (DefaultTableModel) tableDSNV.getModel();
+			    				    		TT = "Đang hoạt động";
+			    	                        model.setValueAt(newTaiKhoan, row, 4);
+			    	                        model.setValueAt(TT, row, 5);
+		    				    		}
+		    				    		else
+		    				    		{
+		    				    			JOptionPane.showMessageDialog(null, "Tên tài khoản bị trùng, vui lòng nhập lại");
+		    				    		}
 		    				    	}
 		    						
 		    				    	
@@ -448,11 +455,25 @@ public class PanelPosition extends JPanel {
 		btnThemViTri.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String newViTri = JOptionPane.showInputDialog(null, "Nhập vị trí mới", "Thêm vị trí", JOptionPane.PLAIN_MESSAGE);
-				if (newViTri != null && !newViTri.isEmpty()) {
-					String maPQ = String.valueOf(cbBoxViTri.getItemCount());
-		            pqBUS.ThemPhanQuyen(maPQ, newViTri);
-		            cbBoxViTri.addItem(newViTri);
-				}
+				if (newViTri != null && !newViTri.isEmpty())
+				{
+		    		var check = true;
+		    		for(int i = 0; i < cbBoxViTri.getItemCount(); i++)
+		    		{
+		    			if(cbBoxViTri.getItemAt(i).equals(newViTri))
+		    				check = false;
+		    		}
+		    		if(check)
+		    		{
+			    		String maPQ = String.valueOf(cbBoxViTri.getItemCount());
+			            pqBUS.ThemPhanQuyen(maPQ, newViTri);
+			            cbBoxViTri.addItem(newViTri);
+		    		}
+		    		else
+		    		{
+		    			JOptionPane.showMessageDialog(null, "Tên phân quyền bị trùng, vui lòng nhập lại");
+		    		}
+		    	}
 				
 			}
 		});
@@ -583,7 +604,7 @@ public class PanelPosition extends JPanel {
 	            String maNV = nv.getMaNV();
 	            String tenNV = nv.getTenNV();
 	            String taiKhoan = nv.getTaiKhoan();
-	            String chucVu = nv.getchucVu();
+	            String chucVu = Integer.valueOf(nv.getchucVu()) == -1? "Chưa có chức vụ" : cbBoxViTri.getItemAt(Integer.valueOf(nv.getchucVu()));
 	          
 	            int tinhTrang = nv.gettinhTrang();
 	   
@@ -628,7 +649,7 @@ public class PanelPosition extends JPanel {
 	            btnSua.setBorderPainted(false);
 	            btnXoa.setBorderPainted(false);
 
-	            Object[] rowData = new Object[] { stt++, maNV, tenNV, cbBoxViTri.getItemAt(Integer.valueOf(chucVu)), taiKhoan, TT, btnTao, btnSua, btnXoa };
+	            Object[] rowData = new Object[] { stt++, maNV, tenNV, chucVu, taiKhoan, TT, btnTao, btnSua, btnXoa };
 	            model.addRow(rowData);
     
 	        }
