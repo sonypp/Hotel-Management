@@ -22,7 +22,8 @@ public class NhanVienBUS {
     public List<DSNhanVienDTO> getAllDSNV() {
         String query = "SELECT maNV, tenNV, chucVu, taiKhoan, tinhTrang\r\n"
         		+ "FROM (\r\n"
-        		+ "	SELECT NHANVIEN.maNV, NHANVIEN.tenNV, NHANVIEN.chucVu,\r\n"
+        		+ "	SELECT NHANVIEN.maNV, NHANVIEN.tenNV,\r\n"
+        		+ " CASE WHEN TAIKHOAN.taiKhoan IS NULL THEN -1 ELSE TAIKHOAN.maPQ END AS chucVu,\r\n"
         		+ "	CASE WHEN TAIKHOAN.taiKhoan IS NULL THEN 'Chưa có tài khoản' ELSE TAIKHOAN.taiKhoan END AS taiKhoan,\r\n"
         		+ "	CASE WHEN TAIKHOAN.tinhTrang IS NULL THEN -1 ELSE TAIKHOAN.tinhTrang END AS tinhTrang,\r\n"
         		+ "	CASE WHEN TAIKHOAN.xuLy IS NULL THEN 0 ELSE TAIKHOAN.xuLy END AS xuly\r\n"
@@ -110,7 +111,7 @@ public class NhanVienBUS {
     }
     public List<DSNhanVienDTO> timKiemNV(String maNV, String tenNV) {
         ArrayList<Object> params = new ArrayList<>();
-        StringBuilder query = new StringBuilder("SELECT NHANVIEN.maNV, NHANVIEN.tenNV, NHANVIEN.chucVu, TAIKHOAN.taiKhoan, TAIKHOAN.tinhTrang FROM NHANVIEN LEFT JOIN TAIKHOAN ON NHANVIEN.maNV = TAIKHOAN.maNV WHERE NHANVIEN.xuLy = 0");
+        StringBuilder query = new StringBuilder("SELECT NHANVIEN.maNV, NHANVIEN.tenNV, TAIKHOAN.maPQ, TAIKHOAN.taiKhoan, TAIKHOAN.tinhTrang FROM NHANVIEN LEFT JOIN TAIKHOAN ON NHANVIEN.maNV = TAIKHOAN.maNV WHERE NHANVIEN.xuLy = 0");
 
         if (!maNV.isEmpty()) {
             query.append(" AND NHANVIEN.maNV LIKE ?");
